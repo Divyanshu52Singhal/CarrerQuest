@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Welcome, {{ admin }}</h1>
+<h2>Student Information</h2>
+<table border="1">
+    <tr>
+        <th>Email</th>
+        <th>Tracks</th>
+    </tr>
+    {% for student in students %}
+    <tr>
+        <td>{{ student["email"] }}</td>
+        <td>
+            {% if student["tracks"] %}
+                <ul>
+                    {% for track in student["tracks"] %}
+                        <li>
+                            <strong>Roadmap:</strong> {{ track["roadmap"] }} <br>
+                            <strong>Courses:</strong> {{ track["courses"] | join(", ") }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                No Tracks Assigned
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{{ url_for('logout') }}">Logout</a>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Add a New Track</h1>
+<form method="POST" action="{{ url_for('admin_add_track') }}">
+    <label for="roadmap">Roadmap:</label>
+    <input type="text" id="roadmap" name="roadmap" required>
+    <label for="courses">Courses (comma-separated):</label>
+    <input type="text" id="courses" name="courses" required>
+    <button type="submit">Add Track</button>
+</form>
+{% endblock %}
