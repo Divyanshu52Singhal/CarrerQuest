@@ -1,9 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_pymongo import PyMongo
 from flask_bcrypt import Bcrypt
+from dotenv import *
+import os
+load_dotenv()
 
 app = Flask(__name__)
-app.config["MONGO_URI"] = ""
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.config["SECRET_KEY"] = "password"
 
 mongo = PyMongo(app)
@@ -14,16 +17,7 @@ bcrypt = Bcrypt(app)
 def landing():
     return render_template("landing.html")
 
-# @app.before_request
-# def setup_admin():
-#     admin_email = "admin@admin.com"
-#     admin_password = "Admin@123"
-#     # Check if admin exists
-#     existing_admin = mongo.db.admins.find_one({"email": admin_email})
-#     if not existing_admin:
-#         hashed_password = bcrypt.generate_password_hash(admin_password).decode("utf-8")
-#         mongo.db.admins.insert_one({"email": admin_email, "password": hashed_password})
-#         print("Admin credentials added: Email - admin@example.com, Password - Admin@123")
+
 # Login
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
