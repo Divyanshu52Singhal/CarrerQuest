@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Add New Roadmap</h1>
+<form method="POST">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" required>
+    <label for="description">Description:</label>
+    <input type="text" id="description" name="description" required>
+    <label for="total_no_of_modules">Total Number of Modules:</label>
+    <input type="number" id="total_no_of_modules" name="total_no_of_modules" required>
+    <label for="course_ids">Course IDs (comma separated):</label>
+    <input type="text" id="course_ids" name="course_ids" required>
+    <button type="submit">Add Roadmap</button>
+</form>
+{% endblock %}

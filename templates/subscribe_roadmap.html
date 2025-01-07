@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Subscribe to Roadmap</h2>
+<p>Roadmap Title: {{ roadmap.title }}</p>
+<p>Description: {{ roadmap.description }}</p>
+
+<form method="POST">
+    <button type="submit">Subscribe</button>
+</form>
+{% endblock %}
+

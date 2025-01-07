@@ -1,22 +1,6 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Available Tracks</h1>
-<form method="POST" action="{{ url_for('view_tracks') }}">
-    <table border="1">
-        <tr>
-            <th>Roadmap</th>
-            <th>Courses</th>
-            <th>Select</th>
-        </tr>
-        {% for track in tracks %}
-        <tr>
-            <td>{{ track["roadmap"] }}</td>
-            <td>{{ track["courses"] | join(", ") }}</td>
-            <td>
-                <button type="submit" name="roadmap" value="{{ track['roadmap'] }}">Opt</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</form>
+<h1>View Track</h1>
+<p>Choose your track and see your progress.</p>
 {% endblock %}

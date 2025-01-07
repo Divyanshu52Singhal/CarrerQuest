@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ roadmap.title }}</h1>
+<p>{{ roadmap.description }}</p>
+{% if message %}
+<div class="alert alert-success" role="alert">
+    {{ message }}
+</div>
+{% endif %}
+<h2>Courses in this Roadmap</h2>
+{% if courses %}
+    <ul>
+        {% for course in courses %}
+            <li>
+                <strong>{{ course.name }}</strong>
+                <ul>
+                    {% for chapter in course.chapters %}
+                        <li>
+                            <form method="POST" action="{{ url_for('update_chapter_status') }}">
+                                <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                                <input type="hidden" name="roadmap_id" value="{{ roadmap.roadmap_id }}">
+                                <input type="hidden" name="chapter_title" value="{{ chapter.title }}">
+                                <input type="hidden" name="completed" value="{% if not chapter.completed %}true{% else %}false{% endif %}">
+                                <button type="submit" class="{% if chapter.completed %}btn btn-success{% else %}btn btn-secondary{% endif %}">
+                                    {% if chapter.completed %}Mark Incomplete{% else %}Mark Complete{% endif %}
+                                </button>
+                                {{ chapter.title }}
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No courses available in this roadmap.</p>
+{% endif %}
+{% endblock %}

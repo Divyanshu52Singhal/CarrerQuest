@@ -10,16 +10,17 @@
     <nav>
         <a href="{{ url_for('landing') }}">Home</a>
         {% if session.get('user') %}
-            <a href="{{ url_for('features') }}">Student Features</a>
-            <a href="{{ url_for('view_tracks')}}">View Track</a>
+            <a href="{{ url_for('student_dashboard') }}">Student Dashboard</a>
             <a href="{{ url_for('logout') }}">Logout</a>
         {% elif session.get('admin') %}
             <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+            <a href="{{ url_for('admin_add_roadmap') }}">Add Roadmap</a>
+            <a href="{{ url_for('admin_add_course') }}">Add Course</a>
             <a href="{{ url_for('logout') }}">Logout</a>
         {% else %}
             <a href="{{ url_for('student_login') }}">Student Login</a>
             <a href="{{ url_for('admin_login') }}">Admin Login</a>
-            <a href="{{ url_for('signup') }}">Signup</a>
+            <a href="{{ url_for('student_signup') }}">Signup</a>
         {% endif %}
     </nav>    
     <main>

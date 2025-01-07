@@ -1,5 +1,8 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Welcome to the Platform!</h1>
-<p>This is a platform for students and admins to manage roadmaps and progress.</p>
+<h1>Welcome to the App</h1>
+<p>Choose an option to get started:</p>
+<a href="{{ url_for('student_login') }}">Student Login</a>
+<a href="{{ url_for('admin_login') }}">Admin Login</a>
 {% endblock %}
