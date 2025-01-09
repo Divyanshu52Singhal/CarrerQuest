@@ -4,17 +4,63 @@
 <h1>Admin Dashboard</h1>
 <h2>Manage Roadmaps and Courses</h2>
 
+<!-- Section to Explore Roadmaps and Courses -->
 <h3>Roadmaps</h3>
 <ul>
     {% for roadmap in roadmaps %}
-        <li>{{ roadmap.title }} - {{ roadmap.description }}</li>
+        <li>
+            <strong>{{ roadmap.title }}</strong> - {{ roadmap.description }}
+            <ul>
+                {% for course in roadmap.courses %}
+                    <li>
+                        <strong>{{ course.name }}</strong> - {{ course.description }}
+                        <ul>
+                            {% for chapter in course.chapters %}
+                                <li>{{ chapter.title }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </li>
     {% endfor %}
 </ul>
 
+<!-- Section to Filter Students -->
 <h3>Students</h3>
-<ul>
-    {% for student in students %}
-        <li>{{ student.email }}</li>
-    {% endfor %}
-</ul>
+<form method="GET" action="{{ url_for('admin_dashboard') }}">
+    <label for="roadmap-filter">Filter by Roadmap:</label>
+    <select name="roadmap_id" id="roadmap-filter">
+        <option value="">All</option>
+        {% for roadmap in roadmaps %}
+            <option value="{{ roadmap.roadmap_id }}" {% if request.args.get('roadmap_id') == roadmap.roadmap_id %}selected{% endif %}>
+                {{ roadmap.title }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Apply Filter</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Subscribed Roadmaps</th>
+            <th>Completion Rate</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in filtered_students %}
+            <tr>
+                <td>{{ student.email }}</td>
+                <td>
+                    {% for roadmap_id in student.subscribed_roadmaps %}
+                        {{ roadmap_titles[roadmap_id] }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ student.completion_rate }}%</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
