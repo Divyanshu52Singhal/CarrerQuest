@@ -49,7 +49,7 @@
         <input type="checkbox" id="filter-email" checked> Email
         <input type="checkbox" id="filter-cgpa" checked> CGPA
         {% for roadmap in roadmaps %}
-            <input type="checkbox" id="filter-roadmap-{{ roadmap.roadmap_id }}" checked> {{ roadmap.title }} Completion Rate
+            <input type="checkbox" id="filter-{{ roadmap.roadmap_id }}" checked> {{ roadmap.title }} Completion Rate
         {% endfor %}
     </div>
 
@@ -65,7 +65,7 @@
             <th class="column-email">Email</th>
             <th class="column-cgpa">CGPA</th>
             {% for roadmap in roadmaps %}
-                <th class="column-roadmap-{{ roadmap.roadmap_id }}">{{ roadmap.title }} Completion Rate</th>
+                <th class="column-{{ roadmap.roadmap_id }}">{{ roadmap.title }} Completion Rate</th>
             {% endfor %}
         </tr>
     </thead>
@@ -101,7 +101,7 @@
                 <td class="column-cgpa">${student.cgpa}</td>
                 ${roadmaps.map(roadmap => {
                     const completionRate = student.completion_rate[roadmap.roadmap_id] || 0;
-                    return `<td class="column-roadmap-${roadmap.roadmap_id}">${completionRate}%</td>`;
+                    return `<td class="column-${roadmap.roadmap_id}">${completionRate}%</td>`;
                 }).join('')}
             `;
             tableBody.appendChild(row);
@@ -115,18 +115,28 @@
     function dynamicSort(keys) {
         return function(a, b) {
             for (let key of keys) {
-                const [property, order] = key.split('-');
-                let aValue = a[property];
-                let bValue = b[property];
-
-                if (property.startsWith('roadmap-')) {
-                    const roadmapId = property.split('-')[1];
+                let aValue, bValue, order;
+                if (key.endsWith('asc')) {
+                    order = 'asc';
+                    key = key.slice(0, -4);
+                } else {
+                    order = 'desc';
+                    key = key.slice(0, -5);
+                }
+                if (key.startsWith('roadmap')) {
+                    const [_, roadmapId, order] = key.split('-');
                     aValue = a.completion_rate[roadmapId] || 0;
                     bValue = b.completion_rate[roadmapId] || 0;
+                    console.log(`Roadmap ID: ${roadmapId}, aValue: ${aValue}, bValue: ${bValue}`);
+                } else {
+                    const [property, order] = key.split('-');
+                    aValue = a[property];
+                    bValue = b[property];
                 }
 
-                if (aValue < bValue) return order === 'asc' ? -1 : 1;
-                if (aValue > bValue) return order === 'asc' ? 1 : -1;
+                console.log(`aValue: ${aValue}, bValue: ${bValue}, order: ${order}, key: ${key}`);
+                if (aValue < bValue) return order === 'desc' ? 1 : -1;
+                if (aValue > bValue) return order === 'desc' ? -1 : 1;
             }
             return 0;
         };
@@ -135,7 +145,9 @@
     // Sorting functionality
     function sortStudents() {
         const sortCriteria = Array.from(document.querySelectorAll(".sort-criteria")).map(select => select.value);
+        console.log(`Sort Criteria: ${sortCriteria}`);
         const sortedStudents = [...students].sort(dynamicSort(sortCriteria));
+        // console.log(`Sorted Students: ${JSON.stringify(sortedStudents, null, 2)}`);
         displayStudents(sortedStudents);
     }
 
@@ -148,6 +160,8 @@
             <select class="sort-criteria">
                 <option value="name-asc">Name (Ascending)</option>
                 <option value="name-desc">Name (Descending)</option>
+                <option value="email-asc">Email (Ascending)</option>
+                <option value="email-desc">Email (Descending)</option>
                 <option value="cgpa-asc">CGPA (Ascending)</option>
                 <option value="cgpa-desc">CGPA (Descending)</option>
                 ${roadmaps.map(roadmap => `

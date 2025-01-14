@@ -94,9 +94,6 @@ def admin_dashboard():
         # Calculate completion rate as a percentage
         student["completion_rate"] = competition_data
 
-        # Apply roadmap filter (if any)
-        if not selected_roadmap_id or selected_roadmap_id in student.get("subscribed_roadmaps", []):
-            filtered_students.append(student)
 
     # Prepare students data for frontend
     students_data = [
@@ -107,7 +104,7 @@ def admin_dashboard():
             "name": student.get("name", ""),
             "cgpa": student.get("cgpa", 0),
         }
-        for student in filtered_students
+        for student in students
     ]
     roadmaps = convert_objectid_to_str(roadmaps)
     students_data = convert_objectid_to_str(students_data)
