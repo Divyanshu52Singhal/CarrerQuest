@@ -3,8 +3,12 @@
 {% block content %}
 <h1>Signup</h1>
 <form method="POST">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
     <label for="email">Email:</label>
     <input type="email" id="email" name="email" required>
+    <label for="cgpa">CGPA:</label>
+    <input type="float" id="cgpa" name="cgpa" required>
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required>
     <button type="submit">Sign Up</button>

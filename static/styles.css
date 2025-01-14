@@ -67,3 +67,23 @@ form input, form button {
     color: red;
     margin-top: 10px;
 }
+
+.toggle-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.toggle-button:hover {
+    background-color: #0056b3;
+}
+
+.collapsible-content {
+    margin-left: 20px;
+    padding: 5px 0;
+}

@@ -1,7 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from collections import defaultdict
 from flask_pymongo import PyMongo
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
+from bson import ObjectId
+import json
 import os
 
 # Load environment variables
@@ -13,6 +16,15 @@ app.config["SECRET_KEY"] = "password"
 mongo = PyMongo(app)
 bcrypt = Bcrypt(app)
 
+def convert_objectid_to_str(data):
+    if isinstance(data, list):
+        return [convert_objectid_to_str(item) for item in data]
+    elif isinstance(data, dict):
+        return {key: convert_objectid_to_str(value) for key, value in data.items()}
+    elif isinstance(data, ObjectId):
+        return str(data)
+    else:
+        return data
 # Home route
 @app.route("/")
 def landing():
@@ -64,28 +76,45 @@ def admin_dashboard():
     filtered_students = []
     for student in students:
         student_progress = student.get("progress", {})
-        total_chapters = 0
-        completed_chapters = 0
-
+        competition_data = defaultdict(int)
+        # print(student_progress)
         for roadmap_id, roadmap_courses in student_progress.items():
+            total_chapters = 0
+            completed_chapters = 0
+            rid = roadmap_id
             for course_id, course_progress in roadmap_courses.items():
-                total_chapters += len(course_progress)
-                completed_chapters += sum(1 for chapter_completed in course_progress.values() if chapter_completed)
+                course = mongo.db.courses.find_one({"course_id": course_id})
+                # print(course)
+                if course:
+                    total_chapters += len(course.get("chapters", []))
+                    completed_chapters += sum(1 for chapter, completed in course_progress.items() if completed)
+            competition_data[roadmap_id] = (completed_chapters / total_chapters) * 100 if total_chapters > 0 else 0
 
-        student["completion_rate"] = (
-            (completed_chapters / total_chapters) * 100 if total_chapters > 0 else 0
-        )
+
+        # Calculate completion rate as a percentage
+        student["completion_rate"] = competition_data
 
         # Apply roadmap filter (if any)
         if not selected_roadmap_id or selected_roadmap_id in student.get("subscribed_roadmaps", []):
             filtered_students.append(student)
 
+    # Prepare students data for frontend
+    students_data = [
+        {
+            "email": student["email"],
+            "subscribed_roadmaps": student.get("subscribed_roadmaps", []),
+            "completion_rate": student["completion_rate"],
+            "name": student.get("name", ""),
+            "cgpa": student.get("cgpa", 0),
+        }
+        for student in filtered_students
+    ]
+    roadmaps = convert_objectid_to_str(roadmaps)
+    students_data = convert_objectid_to_str(students_data)
     return render_template(
         "admin_dashboard.html",
         roadmaps=roadmaps,
-        students=students,
-        filtered_students=filtered_students,
-        roadmap_titles=roadmap_titles,
+        students_data=students_data,
     )
 # Add Roadmap (Admin)
 @app.route("/admin/add_roadmap", methods=["GET", "POST"])
@@ -283,8 +312,10 @@ def mark_chapter():
 @app.route("/student/signup", methods=["GET", "POST"])
 def student_signup():
     if request.method == "POST":
+        name = request.form["name"]
         email = request.form["email"]
         password = request.form["password"]
+        cgpa = request.form["cgpa"]
         hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
         
         # Check if the student already exists
@@ -293,8 +324,10 @@ def student_signup():
 
         # Insert new student into the database
         student = {
+            "name" : name,
             "email": email,
-            "password": hashed_password
+            "password": hashed_password,
+            "cgpa": cgpa
         }
         mongo.db.students.insert_one(student)
         return redirect(url_for("student_login"))
