@@ -1,30 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ title }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <nav>
+    <!-- Global styles -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+    <!-- Page specific styles -->
+    {% block styles %}{% endblock %}
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">LOGOME</div>
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="nav-links">
         <a href="{{ url_for('landing') }}">Home</a>
         {% if session.get('user') %}
-            <a href="{{ url_for('student_dashboard') }}">Student Dashboard</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
+        <a href="{{ url_for('student_dashboard') }}">Student Dashboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
         {% elif session.get('admin') %}
-            <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
-            <a href="{{ url_for('admin_add_roadmap') }}">Add Roadmap</a>
-            <a href="{{ url_for('admin_add_course') }}">Add Course</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
+        <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+        <a href="{{ url_for('admin_add_roadmap') }}">Add Roadmap</a>
+        <a href="{{ url_for('admin_add_course') }}">Add Course</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
         {% else %}
-            <a href="{{ url_for('student_login') }}">Student Login</a>
-            <a href="{{ url_for('admin_login') }}">Admin Login</a>
-            <a href="{{ url_for('student_signup') }}">Signup</a>
+        <a href="{{ url_for('student_login') }}">Student Login</a>
+        <a href="{{ url_for('admin_login') }}">Admin Login</a>
+        <a href="{{ url_for('student_signup') }}">Signup</a>
         {% endif %}
-    </nav>    
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-</body>
+        <a href="#">About</a>
+        <a href="#">Services</a>
+      </div>
+    </nav>
+    {% block content %}{% endblock %}
+
+    <script>
+      document
+        .querySelector(".hamburger")
+        .addEventListener("click", function () {
+          this.classList.toggle("active");
+          document.querySelector(".nav-links").classList.toggle("active");
+        });
+    </script>
+
+    
+  </body>
 </html>

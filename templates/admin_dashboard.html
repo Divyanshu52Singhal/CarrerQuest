@@ -1,78 +1,104 @@
 {% extends "base.html" %}
 
+{% block title %}Admin Login{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+{% endblock %}
+
 {% block content %}
 <h1>Admin Dashboard</h1>
 
 <!-- Roadmaps Section -->
-<h3>Roadmaps</h3>
-<div id="roadmap-section">
-    {% for roadmap in roadmaps %}
-        <div class="roadmap">
-            <button class="toggle-button" onclick="toggleVisibility('roadmap-{{ loop.index }}')">
-                {{ roadmap.title }}
-            </button>
-            &#8594; {{ roadmap.description }}
-
-            <div id="roadmap-{{ loop.index }}" class="collapsible-content" style="display: none;">
-                <ul>
-                    {% for course in roadmap.courses %}
-                        <li>
-                            <strong>{{ course.name }}</strong> - {{ course.description }}
-                            <button class="toggle-button" onclick="toggleVisibility('course-{{ course.name}}')">
-                                View Chapters
-                            </button>
-                            <ul id="course-{{course.name}}" class="collapsible-content" style="display: none;">
-                                {% for chapter in course.chapters %}
-                                    <li>{{ chapter.title }}</li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    {% endfor %}
-</div>
-
-<h3>Sort and Filter Students</h3>
-<form id="sorting-form">
-    <!-- Sorting Buttons -->
-    <div id="sort-criteria-container">
-        <label>Sort by:</label>
-        <button type="button" onclick="addSortCriteria()">Add Criteria</button>
-    </div>
-
-    <!-- Column Filter Checkboxes -->
-    <div id="filter-columns-container">
-        <label>Filter Columns:</label>
-        <input type="checkbox" id="filter-name" checked> Name
-        <input type="checkbox" id="filter-email" checked> Email
-        <input type="checkbox" id="filter-cgpa" checked> CGPA
+<div class="dashboard-section">
+    <h3 class="section-title">Roadmaps</h3>
+    <div id="roadmap-section">
         {% for roadmap in roadmaps %}
-            <input type="checkbox" id="filter-{{ roadmap.roadmap_id }}" checked> {{ roadmap.title }} Completion Rate
+            <div class="roadmap-card">
+                <button class="toggle-button gradient-button" onclick="toggleVisibility('roadmap-{{ loop.index }}')">
+                    {{ roadmap.title }}
+                </button>
+                <span class="roadmap-description">&#8594; {{ roadmap.description }}</span>
+
+                <div id="roadmap-{{ loop.index }}" class="collapsible-content" style="display: none;">
+                    <ul class="course-list">
+                        {% for course in roadmap.courses %}
+                            <li class="course-item">
+                                <div class="course-header">
+                                    <strong>{{ course.name }}</strong>
+                                    <p class="course-description">{{ course.description }}</p>
+                                    <button class="toggle-button secondary-button" onclick="toggleVisibility('course-{{ course.name}}')">
+                                        View Chapters
+                                    </button>
+                                </div>
+                                <ul id="course-{{course.name}}" class="chapter-list collapsible-content" style="display: none;">
+                                    {% for chapter in course.chapters %}
+                                        <li class="chapter-item">{{ chapter.title }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         {% endfor %}
     </div>
+</div>
 
-    <!-- Button to apply sorting and filtering -->
-    <button type="button" id="apply-button">Apply</button>
-</form>
+<!-- Students Section -->
+<div class="dashboard-section">
+    <h3 class="section-title">Sort and Filter Students</h3>
+    <form id="sorting-form" class="control-panel">
+        <div id="sort-criteria-container" class="sort-section">
+            <label class="control-label">Sort by:</label>
+            <button type="button" class="add-criteria-button gradient-button" onclick="addSortCriteria()">
+                Add Criteria
+            </button>
+        </div>
 
-<!-- Students Table -->
-<table id="students-table" border="1">
-    <thead>
-        <tr>
-            <th class="column-name">Name</th>
-            <th class="column-email">Email</th>
-            <th class="column-cgpa">CGPA</th>
-            {% for roadmap in roadmaps %}
-                <th class="column-{{ roadmap.roadmap_id }}">{{ roadmap.title }} Completion Rate</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Populated dynamically by JavaScript -->
-    </tbody>
-</table>
+        <div id="filter-columns-container" class="filter-section">
+            <label class="control-label">Filter Columns:</label>
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="filter-name" checked> Name
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="filter-email" checked> Email
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="filter-cgpa" checked> CGPA
+                </label>
+                {% for roadmap in roadmaps %}
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="filter-{{ roadmap.roadmap_id }}" checked> 
+                        {{ roadmap.title }} Completion Rate
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button type="button" id="apply-button" class="apply-button gradient-button">Apply</button>
+    </form>
+
+    <div class="table-container">
+        <table id="students-table">
+            <thead>
+                <tr>
+                    <th class="column-name">Name</th>
+                    <th class="column-email">Email</th>
+                    <th class="column-cgpa">CGPA</th>
+                    {% for roadmap in roadmaps %}
+                        <th class="column-{{ roadmap.roadmap_id }}">{{ roadmap.title }} Completion Rate</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Populated dynamically by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
 
 <script>
     function toggleVisibility(id) {
