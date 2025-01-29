@@ -1,15 +1,54 @@
 {% extends "base.html" %}
 
+{% block title %}Student Login{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/student_login.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>Student Login</h1>
-<form method="POST">
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-    <button type="submit">Login</button>
-</form>
-{% if error %}
-    <p style="color: red;">{{ error }}</p>
-{% endif %}
+<div class="student-login-container">
+    <div class="student-login-card">
+        <div class="student-login-header">
+            <h1>Student Login</h1>
+            <p>Access your learning journey</p>
+        </div>
+        
+        <form method="POST">
+            <div class="student-form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    placeholder="Enter your email"
+                    autocomplete="email">
+            </div>
+            
+            <div class="student-form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    placeholder="Enter your password"
+                    autocomplete="current-password">
+            </div>
+            
+            <button type="submit" class="student-submit-btn">
+                Sign In
+            </button>
+            
+            {% if error %}
+                <div class="student-error-message">{{ error }}</div>
+            {% endif %}
+        </form>
+
+        <div class="student-signup-link">
+            <p>Don't have an account? <a href="{{ url_for('student_signup') }}">Sign up</a></p>
+        </div>
+    </div>
+</div>
 {% endblock %}

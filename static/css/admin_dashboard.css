@@ -1,0 +1,216 @@
+/* Admin Dashboard Styles */
+:root {
+    --gradient: linear-gradient(-45deg, #8b5cf6, #6366f1, #a78bfa, #7c3aed);
+    --primary-color: #6366f1;
+    --secondary-color: #8b5cf6;
+    --background-color: #f3f4f6;
+    --card-background: #ffffff;
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --border-radius: 8px;
+    --spacing: 1.5rem;
+}
+
+.admin-container {
+    padding: var(--spacing);
+    background-color: var(--background-color);
+    min-height: 100vh;
+}
+
+.dashboard-title {
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing);
+    font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.dashboard-section {
+    background: var(--card-background);
+    border-radius: var(--border-radius);
+    padding: var(--spacing);
+    margin-bottom: var(--spacing);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+/* Roadmap Styles */
+.roadmap-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    background: #f9fafb;
+}
+
+.roadmap-description {
+    color: var(--text-secondary);
+    margin-left: 0.5rem;
+}
+
+.course-list {
+    list-style: none;
+    padding-left: 1rem;
+    margin-top: 1rem;
+}
+
+.course-item {
+    margin-bottom: 1rem;
+}
+
+.course-header {
+    margin-bottom: 0.5rem;
+}
+
+.course-description {
+    color: var(--text-secondary);
+    margin: 0.5rem 0;
+}
+
+.chapter-list {
+    list-style: none;
+    padding-left: 1.5rem;
+}
+
+.chapter-item {
+    color: var(--text-secondary);
+    padding: 0.5rem 0;
+}
+
+/* Button Styles */
+.gradient-button {
+    background: var(--gradient);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 500;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gradient-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.secondary-button {
+    background: white;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.secondary-button:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Control Panel Styles */
+.control-panel {
+    background: #f9fafb;
+    padding: var(--spacing);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--spacing);
+}
+
+.sort-section, .filter-section {
+    margin-bottom: 1rem;
+}
+
+.control-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+}
+
+#students-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+#students-table th {
+    background: var(--gradient);
+    color: white;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+#students-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    color: var(--text-secondary);
+}
+
+#students-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* Sort Criteria Styles */
+.sort-criteria-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.sort-criteria {
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--border-radius);
+    flex: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .checkbox-group {
+        flex-direction: column;
+    }
+
+    .dashboard-title {
+        font-size: 2rem;
+    }
+
+    .gradient-button, .secondary-button {
+        width: 100%;
+        text-align: center;
+    }
+
+    .sort-criteria-item {
+        flex-direction: column;
+    }
+}

@@ -1,8 +1,40 @@
-{% extends "base.html" %}
-
-{% block content %}
-<h1>Welcome to the App</h1>
-<p>Choose an option to get started:</p>
-<a href="{{ url_for('student_login') }}">Student Login</a>
-<a href="{{ url_for('admin_login') }}">Admin Login</a>
+{% extends "base.html" %} {% block content %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Landing Page</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/landing.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="hero-section">
+      <div class="hero-content">
+        <h1>Why do we use it?</h1>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque
+          facilisis sollicitudin ante.
+        </p>
+        <div class="button-container">
+          <a
+            href="{{ url_for('student_login') }}"
+            class="login-btn student-login"
+            >Student Login</a
+          >
+          <a href="{{ url_for('admin_login') }}" class="login-btn admin-login"
+            >Admin Login</a
+          >
+        </div>
+      </div>
+      <div class="wave-shape"></div>
+    </div>
+  </body>
+</html>
 {% endblock %}
