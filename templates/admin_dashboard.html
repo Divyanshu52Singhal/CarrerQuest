@@ -127,14 +127,14 @@
                     const [_, roadmapId, order] = key.split('-');
                     aValue = a.completion_rate[roadmapId] || 0;
                     bValue = b.completion_rate[roadmapId] || 0;
-                    console.log(`Roadmap ID: ${roadmapId}, aValue: ${aValue}, bValue: ${bValue}`);
+                    // console.log(`Roadmap ID: ${roadmapId}, aValue: ${aValue}, bValue: ${bValue}`);
                 } else {
                     const [property, order] = key.split('-');
                     aValue = a[property];
                     bValue = b[property];
                 }
 
-                console.log(`aValue: ${aValue}, bValue: ${bValue}, order: ${order}, key: ${key}`);
+                // console.log(`aValue: ${aValue}, bValue: ${bValue}, order: ${order}, key: ${key}`);
                 if (aValue < bValue) return order === 'desc' ? 1 : -1;
                 if (aValue > bValue) return order === 'desc' ? -1 : 1;
             }

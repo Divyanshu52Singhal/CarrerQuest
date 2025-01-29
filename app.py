@@ -59,43 +59,26 @@ def student_login():
 # Admin Dashboard
 @app.route("/admin/dashboard")
 def admin_dashboard():
-    # Fetch all roadmaps
     roadmaps = list(mongo.db.roadmaps.find())
-    roadmap_titles = {roadmap["roadmap_id"]: roadmap["title"] for roadmap in roadmaps}
-
-    # Fetch all courses for each roadmap
     for roadmap in roadmaps:
         course_ids = roadmap.get("course_ids", [])
         roadmap["courses"] = list(mongo.db.courses.find({"course_id": {"$in": course_ids}}))
-
-    # Get the selected roadmap filter (if any)
-    selected_roadmap_id = request.args.get("roadmap_id", "")
-
-    # Fetch all students and calculate completion rates
     students = list(mongo.db.students.find())
-    filtered_students = []
     for student in students:
         student_progress = student.get("progress", {})
         competition_data = defaultdict(int)
-        # print(student_progress)
         for roadmap_id, roadmap_courses in student_progress.items():
             total_chapters = 0
             completed_chapters = 0
-            rid = roadmap_id
             for course_id, course_progress in roadmap_courses.items():
                 course = mongo.db.courses.find_one({"course_id": course_id})
-                # print(course)
                 if course:
                     total_chapters += len(course.get("chapters", []))
                     completed_chapters += sum(1 for chapter, completed in course_progress.items() if completed)
             competition_data[roadmap_id] = (completed_chapters / total_chapters) * 100 if total_chapters > 0 else 0
 
-
-        # Calculate completion rate as a percentage
         student["completion_rate"] = competition_data
 
-
-    # Prepare students data for frontend
     students_data = [
         {
             "email": student["email"],
@@ -113,6 +96,7 @@ def admin_dashboard():
         roadmaps=roadmaps,
         students_data=students_data,
     )
+
 # Add Roadmap (Admin)
 @app.route("/admin/add_roadmap", methods=["GET", "POST"])
 def admin_add_roadmap():
@@ -150,7 +134,7 @@ def admin_add_course():
             {"$addToSet": {"course_ids": course["course_id"]}}
         )
         return redirect(url_for("admin_dashboard"))
-    roadmaps = list(mongo.db.roadmaps.find())  # Fetch roadmaps for selection
+    roadmaps = list(mongo.db.roadmaps.find()) 
     return render_template("add_course.html", roadmaps=roadmaps)
 
 # Student Dashboard
@@ -158,20 +142,13 @@ def admin_add_course():
 def student_dashboard():
     if "user" not in session:
         return redirect(url_for("student_login"))
-
     user_email = session["user"]
-    subscribed_roadmaps = list(
-        mongo.db.roadmaps.find({"subscribed_user_ids": user_email})
-    )
-    unsubscribed_roadmaps = list(
-        mongo.db.roadmaps.find({"subscribed_user_ids": {"$ne": user_email}})
-    )
-    return render_template(
-        "student_dashboard.html",
+    subscribed_roadmaps = list(mongo.db.roadmaps.find({"subscribed_user_ids": user_email}))
+    unsubscribed_roadmaps = list(mongo.db.roadmaps.find({"subscribed_user_ids": {"$ne": user_email}}))
+    return render_template("student_dashboard.html",
         user=session["user"],
         subscribed_roadmaps=subscribed_roadmaps,
-        unsubscribed_roadmaps=unsubscribed_roadmaps,
-    )
+        unsubscribed_roadmaps=unsubscribed_roadmaps)
 
 # Subscribe to Roadmap (Student)
 @app.route("/student/subscribe/<roadmap_id>", methods=["GET", "POST"])
@@ -183,10 +160,8 @@ def subscribe_roadmap(roadmap_id):
         return redirect(url_for("student_dashboard", message="Roadmap not found"))
     if request.method == "POST":
         # Add roadmap to the user's subscribed list
-        mongo.db.students.update_one(
-            {"email": session["user"]},
-            {"$addToSet": {"subscribed_roadmaps": roadmap_id}}
-        )
+        mongo.db.students.update_one({"email": session["user"]},
+            {"$addToSet": {"subscribed_roadmaps": roadmap_id}})
 
         # Add user to the roadmap's subscriber list
         mongo.db.roadmaps.update_one(
@@ -205,11 +180,10 @@ def subscribe_roadmap(roadmap_id):
             {"email": session["user"]},
             {"$set": {f"progress.{roadmap_id}": progress_template}}
         )
-
         # Redirect to dashboard with a success message
         return redirect(url_for("student_dashboard", message="Successfully subscribed to the roadmap"))
-
     return render_template("subscribe_roadmap.html", roadmap=roadmap)
+
 @app.route("/student/roadmap/<roadmap_id>")
 def view_roadmap(roadmap_id):
     if "user" not in session:
@@ -233,7 +207,6 @@ def view_roadmap(roadmap_id):
         course_id = course["course_id"]
         for chapter in course["chapters"]:
             chapter["completed"] = progress.get(course_id, {}).get(chapter["title"], False)
-    
     message = request.args.get("message")
     return render_template("view_roadmap.html", roadmap=roadmap, courses=courses, message=message)
 
@@ -246,7 +219,6 @@ def update_chapter_status():
     course_id = request.form["course_id"]
     chapter_title = request.form["chapter_title"]
     completed = request.form["completed"] == "true"
-
     user_email = session["user"]
     # Fetch the user document
     student = mongo.db.students.find_one({"email": user_email})
@@ -277,34 +249,9 @@ def update_chapter_status():
     if not course:
         return jsonify({"error": "Course not found"}), 404
 
-    total_chapters = len(course["chapters"])
-    completed_chapters = sum(
-        1 for chapter in course["chapters"]
-        if student["progress"][roadmap_id][course_id].get(chapter["title"], False)
-    )
-    completion_percentage = (completed_chapters / total_chapters) * 100
-
     # Send response back
     status_message = f"Chapter '{chapter_title}' marked as {'Complete' if completed else 'Incomplete'}."
     return redirect(url_for("view_roadmap", roadmap_id=roadmap_id, message=status_message))
-
-# Mark Chapter Completion (Student)
-@app.route("/student/mark_chapter", methods=["POST"])
-def mark_chapter():
-    if "user" not in session:
-        return redirect(url_for("student_login"))
-    course_id = request.form["course_id"]
-    chapter_title = request.form["chapter_title"]
-    course = mongo.db.courses.find_one({"course_id": course_id})
-    for chapter in course["chapters"]:
-        if chapter["title"] == chapter_title:
-            chapter["completed"] = True
-    completion_percentage = (sum(1 for c in course["chapters"] if c["completed"]) / len(course["chapters"])) * 100
-    mongo.db.courses.update_one(
-        {"course_id": course_id},
-        {"$set": {"chapters": course["chapters"], "completion_percentage": completion_percentage}}
-    )
-    return jsonify({"success": True})
 
 @app.route("/student/signup", methods=["GET", "POST"])
 def student_signup():
@@ -327,9 +274,9 @@ def student_signup():
             "cgpa": cgpa
         }
         mongo.db.students.insert_one(student)
-        return redirect(url_for("student_login"))
-    
+        return redirect(url_for("student_login"))    
     return render_template("student_signup.html")
+
 # Logout
 @app.route("/logout")
 def logout():
