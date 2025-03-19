@@ -122,10 +122,13 @@ def admin_add_course():
         return redirect(url_for("admin_login"))
     if request.method == "POST":
         roadmap_id = request.form["roadmap_id"]
+        chapters = []
+        for title, link in zip(request.form.getlist("chapters[]"), request.form.getlist("links[]")):
+            chapters.append({"title": title, "link": link, "completed": False})
         course = {
             "course_id": os.urandom(8).hex(),
             "name": request.form["name"],
-            "chapters": [{"title": chapter, "completed": False} for chapter in request.form["chapters"].split(",")],
+            "chapters": chapters,
             "completion_percentage": 0
         }
         mongo.db.courses.insert_one(course)
@@ -134,7 +137,7 @@ def admin_add_course():
             {"$addToSet": {"course_ids": course["course_id"]}}
         )
         return redirect(url_for("admin_dashboard"))
-    roadmaps = list(mongo.db.roadmaps.find()) 
+    roadmaps = list(mongo.db.roadmaps.find())
     return render_template("add_course.html", roadmaps=roadmaps)
 
 # Student Dashboard

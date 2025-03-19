@@ -26,6 +26,14 @@
                                     {% if chapter.completed %}Mark Incomplete{% else %}Mark Complete{% endif %}
                                 </button>
                                 {{ chapter.title }}
+                                {% if chapter.link %}
+                                <a href="{% if '://' in chapter.link %}{{ chapter.link }}{% else %}https://{{ chapter.link }}{% endif %}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer">
+                                   Reference
+                                </a>
+                            {% endif %} 
+                            
                             </form>
                         </li>
                     {% endfor %}
