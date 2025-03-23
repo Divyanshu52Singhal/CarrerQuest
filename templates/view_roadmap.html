@@ -32,8 +32,13 @@
                                    rel="noopener noreferrer">
                                    Reference
                                 </a>
-                            {% endif %} 
-                            
+                                {% endif %} 
+                                
+                                <!-- Add this new Quiz button -->
+                                <a href="{{ url_for('take_chapter_quiz', roadmap_id=roadmap.roadmap_id, course_id=course.course_id, chapter_title=chapter.title) }}" 
+                                   class="btn btn-primary btn-sm">
+                                   Take Quiz
+                                </a>
                             </form>
                         </li>
                     {% endfor %}

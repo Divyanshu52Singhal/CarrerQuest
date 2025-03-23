@@ -4,6 +4,27 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+<style>
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    .edit-button {
+        padding: 4px 8px;
+        font-size: 0.9em;
+    }
+    .secondary-button {
+        background-color: #5a6268;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .edit-button:hover {
+        background-color: #4c545a;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -15,10 +36,19 @@
     <div id="roadmap-section">
         {% for roadmap in roadmaps %}
             <div class="roadmap-card">
-                <button class="toggle-button gradient-button" onclick="toggleVisibility('roadmap-{{ loop.index }}')">
-                    {{ roadmap.title }}
-                </button>
-                <span class="roadmap-description">&#8594; {{ roadmap.description }}</span>
+                <div class="roadmap-header">
+                    <button class="toggle-button gradient-button" onclick="toggleVisibility('roadmap-{{ loop.index }}')">
+                        {{ roadmap.title }}
+                    </button>
+                    <span class="roadmap-description">&#8594; {{ roadmap.description }}</span>
+                </div>
+                
+                <div class="action-buttons">
+                    <a href="{{ url_for('admin_edit_roadmap', roadmap_id=roadmap.roadmap_id) }}" 
+                       class="edit-button secondary-button">
+                       Edit Roadmap
+                    </a>
+                </div>
 
                 <div id="roadmap-{{ loop.index }}" class="collapsible-content" style="display: none;">
                     <ul class="course-list">
@@ -27,9 +57,15 @@
                                 <div class="course-header">
                                     <strong>{{ course.name }}</strong>
                                     <p class="course-description">{{ course.description }}</p>
-                                    <button class="toggle-button secondary-button" onclick="toggleVisibility('course-{{ course.name}}')">
-                                        View Chapters
-                                    </button>
+                                    <div class="action-buttons">
+                                        <button class="toggle-button secondary-button" onclick="toggleVisibility('course-{{ course.name}}')">
+                                            View Chapters
+                                        </button>
+                                        <a href="{{ url_for('admin_edit_course', roadmap_id=roadmap.roadmap_id, course_id=course.course_id) }}" 
+                                           class="edit-button secondary-button">
+                                           Edit Course
+                                        </a>
+                                    </div>
                                 </div>
                                 <ul id="course-{{course.name}}" class="chapter-list collapsible-content" style="display: none;">
                                     {% for chapter in course.chapters %}
@@ -39,7 +75,12 @@
                                                rel="noopener noreferrer">
                                                Reference
                                             </a>
-                                        {% endif %}</li>
+                                            
+                                        {% endif %}
+                                        <a href="{{ url_for('create_quiz', roadmap_id=roadmap.roadmap_id, course_id=course.course_id, chapter_title=chapter.title) }}" 
+                                        class="btn btn-sm btn-secondary">
+                                        Create/Edit Quiz
+                                     </a></li>
                                     {% endfor %}
                                 </ul>
                             </li>
@@ -50,6 +91,7 @@
         {% endfor %}
     </div>
 </div>
+
 
 <!-- Students Section -->
 <div class="dashboard-section">

@@ -107,9 +107,7 @@ def admin_add_roadmap():
             "roadmap_id": os.urandom(8).hex(),
             "title": request.form["title"],
             "description": request.form["description"],
-            "total_no_of_modules": int(request.form["total_no_of_modules"]),
             "subscribed_user_ids": [],
-            "completion_percentage": 0
         }
         mongo.db.roadmaps.insert_one(roadmap)
         return redirect(url_for("admin_dashboard"))
@@ -139,7 +137,390 @@ def admin_add_course():
         return redirect(url_for("admin_dashboard"))
     roadmaps = list(mongo.db.roadmaps.find())
     return render_template("add_course.html", roadmaps=roadmaps)
+# Delete Roadmap (Admin)
+@app.route("/admin/delete_roadmap/<roadmap_id>", methods=["POST"])
+def admin_delete_roadmap(roadmap_id):
+    if "admin" not in session:
+        return redirect(url_for("admin_login"))
+    
+    # Get the roadmap to find associated courses
+    roadmap = mongo.db.roadmaps.find_one({"roadmap_id": roadmap_id})
+    if not roadmap:
+        return redirect(url_for("admin_dashboard"))
+    
+    # Get course_ids associated with this roadmap
+    course_ids = roadmap.get("course_ids", [])
+    
+    # Delete all associated courses
+    if course_ids:
+        mongo.db.courses.delete_many({"course_id": {"$in": course_ids}})
+    
+    # Delete all associated quizzes
+    mongo.db.quizzes.delete_many({"roadmap_id": roadmap_id})
+    
+    # Remove roadmap from student subscriptions and progress
+    students = list(mongo.db.students.find({"subscribed_roadmaps": roadmap_id}))
+    for student in students:
+        # Remove from subscribed_roadmaps
+        mongo.db.students.update_one(
+            {"_id": student["_id"]},
+            {"$pull": {"subscribed_roadmaps": roadmap_id}}
+        )
+        
+        # Remove from progress if exists
+        if "progress" in student and roadmap_id in student["progress"]:
+            mongo.db.students.update_one(
+                {"_id": student["_id"]},
+                {"$unset": {f"progress.{roadmap_id}": ""}}
+            )
+        
+        # Remove from quiz_results if exists
+        if "quiz_results" in student and roadmap_id in student["quiz_results"]:
+            mongo.db.students.update_one(
+                {"_id": student["_id"]},
+                {"$unset": {f"quiz_results.{roadmap_id}": ""}}
+            )
+    
+    # Delete the roadmap
+    mongo.db.roadmaps.delete_one({"roadmap_id": roadmap_id})
+    
+    return redirect(url_for("admin_dashboard"))
 
+# Delete Course (Admin)
+@app.route("/admin/delete_course/<roadmap_id>/<course_id>", methods=["POST"])
+def admin_delete_course(roadmap_id, course_id):
+    if "admin" not in session:
+        return redirect(url_for("admin_login"))
+    
+    # Remove course from roadmap
+    mongo.db.roadmaps.update_one(
+        {"roadmap_id": roadmap_id},
+        {"$pull": {"course_ids": course_id}}
+    )
+    
+    # Delete all quizzes associated with this course
+    mongo.db.quizzes.delete_many({"roadmap_id": roadmap_id, "course_id": course_id})
+    
+    # Remove course from student progress and quiz results
+    students = list(mongo.db.students.find({f"progress.{roadmap_id}.{course_id}": {"$exists": True}}))
+    for student in students:
+        # Remove from progress if exists
+        if "progress" in student and roadmap_id in student["progress"] and course_id in student["progress"][roadmap_id]:
+            mongo.db.students.update_one(
+                {"_id": student["_id"]},
+                {"$unset": {f"progress.{roadmap_id}.{course_id}": ""}}
+            )
+        
+        # Remove from quiz_results if exists
+        if "quiz_results" in student and roadmap_id in student["quiz_results"] and course_id in student["quiz_results"][roadmap_id]:
+            mongo.db.students.update_one(
+                {"_id": student["_id"]},
+                {"$unset": {f"quiz_results.{roadmap_id}.{course_id}": ""}}
+            )
+    
+    # Delete the course
+    mongo.db.courses.delete_one({"course_id": course_id})
+    
+    return redirect(url_for("admin_dashboard"))
+
+# Edit Roadmap (Admin)
+@app.route("/admin/edit_roadmap/<roadmap_id>", methods=["GET", "POST"])
+def admin_edit_roadmap(roadmap_id):
+    if "admin" not in session:
+        return redirect(url_for("admin_login"))
+    
+    roadmap = mongo.db.roadmaps.find_one({"roadmap_id": roadmap_id})
+    if not roadmap:
+        return redirect(url_for("admin_dashboard"))
+    
+    if request.method == "POST":
+        # Update roadmap information
+        updated_roadmap = {
+            "title": request.form["title"],
+            "description": request.form["description"]
+        }
+        
+        mongo.db.roadmaps.update_one(
+            {"roadmap_id": roadmap_id},
+            {"$set": updated_roadmap}
+        )
+        
+        return redirect(url_for("admin_dashboard"))
+    
+    return render_template("edit_roadmap.html", roadmap=roadmap)
+
+# Edit Course (Admin)
+@app.route("/admin/edit_course/<roadmap_id>/<course_id>", methods=["GET", "POST"])
+def admin_edit_course(roadmap_id, course_id):
+    if "admin" not in session:
+        return redirect(url_for("admin_login"))
+    
+    course = mongo.db.courses.find_one({"course_id": course_id})
+    if not course:
+        return redirect(url_for("admin_dashboard"))
+    
+    if request.method == "POST":
+        # Process the updated chapters
+        chapter_titles = request.form.getlist("chapters[]")
+        reference_titles_by_chapter = {}
+        reference_links_by_chapter = {}
+        
+        # Process reference data
+        for key, value in request.form.items():
+            if key.startswith('reference_titles['):
+                chapter_idx = int(key.split('[')[1].split(']')[0])
+                if chapter_idx not in reference_titles_by_chapter:
+                    reference_titles_by_chapter[chapter_idx] = []
+                reference_titles_by_chapter[chapter_idx].append(value)
+            elif key.startswith('reference_links['):
+                chapter_idx = int(key.split('[')[1].split(']')[0])
+                if chapter_idx not in reference_links_by_chapter:
+                    reference_links_by_chapter[chapter_idx] = []
+                reference_links_by_chapter[chapter_idx].append(value)
+        
+        chapters = []
+        for idx, title in enumerate(chapter_titles):
+            # Find if this chapter existed before to preserve completion status
+            existing_chapter = next((ch for ch in course.get("chapters", []) if ch["title"] == title), None)
+            
+            # Collect references for this chapter
+            references = []
+            if idx in reference_titles_by_chapter and idx in reference_links_by_chapter:
+                for ref_title, ref_link in zip(reference_titles_by_chapter[idx], reference_links_by_chapter[idx]):
+                    references.append({
+                        "title": ref_title,
+                        "link": ref_link
+                    })
+            
+            new_chapter = {
+                "title": title,
+                "references": references,
+                "completed": existing_chapter.get("completed", False) if existing_chapter else False
+            }
+            
+            # For backward compatibility, also include the first link as 'link' field
+            if references:
+                new_chapter["link"] = references[0]["link"]
+            
+            chapters.append(new_chapter)
+        
+        # Update course information
+        updated_course = {
+            "name": request.form["name"],
+            "chapters": chapters
+        }
+        
+        mongo.db.courses.update_one(
+            {"course_id": course_id},
+            {"$set": updated_course}
+        )
+        
+        # Handle student progress updates for changed/removed chapters
+        students = list(mongo.db.students.find({f"progress.{roadmap_id}.{course_id}": {"$exists": True}}))
+        for student in students:
+            # Get current progress for this course
+            course_progress = student.get("progress", {}).get(roadmap_id, {}).get(course_id, {})
+            
+            # Remove progress entries for chapters that no longer exist
+            existing_chapter_titles = [ch["title"] for ch in chapters]
+            for chapter_title in list(course_progress.keys()):
+                if chapter_title not in existing_chapter_titles:
+                    course_progress.pop(chapter_title, None)
+            
+            # Update the student's progress
+            mongo.db.students.update_one(
+                {"_id": student["_id"]},
+                {"$set": {f"progress.{roadmap_id}.{course_id}": course_progress}}
+            )
+        
+        return redirect(url_for("admin_dashboard"))
+    
+    roadmap = mongo.db.roadmaps.find_one({"roadmap_id": roadmap_id})
+    return render_template("edit_course.html", course=course, roadmap=roadmap)
+# Quiz Routes
+@app.route("/student/quiz/<roadmap_id>/<course_id>/<chapter_title>", methods=["GET", "POST"])
+def take_chapter_quiz(roadmap_id, course_id, chapter_title):
+    if "user" not in session:
+        return redirect(url_for("student_login"))
+    
+    user_email = session["user"]
+    student = mongo.db.students.find_one({"email": user_email})
+    
+    # Check if student is subscribed to this roadmap
+    if roadmap_id not in student.get("subscribed_roadmaps", []):
+        return redirect(url_for("student_dashboard", message="You are not subscribed to this roadmap"))
+    
+    # Fetch quiz for this chapter
+    quiz = mongo.db.quizzes.find_one({
+        "roadmap_id": roadmap_id,
+        "course_id": course_id,
+        "chapter_title": chapter_title
+    })
+    
+    # If quiz doesn't exist yet
+    if not quiz:
+        return render_template("no_quiz.html", 
+                              roadmap_id=roadmap_id, 
+                              course_id=course_id, 
+                              chapter_title=chapter_title)
+    
+    if request.method == "POST":
+        # Calculate score
+        score = 0
+        total_questions = len(quiz.get("questions", []))
+        timer_expired = request.form.get("timer_expired") == "true"
+        time_taken = int(request.form.get("time_taken", 0))
+        
+        for i, question in enumerate(quiz.get("questions", [])):
+            submitted_answer = request.form.get(f"answer_{i}")
+            if submitted_answer == question.get("correct_answer"):
+                score += 1
+        
+        percentage_score = (score / total_questions) * 100 if total_questions > 0 else 0
+        
+        # Parse time limit from the quiz (format: MM:SS)
+        time_limit = quiz.get("time_limit", "1:00")
+        minutes, seconds = map(int, time_limit.split(":"))
+        total_seconds = minutes * 60 + seconds
+        
+        # Update student's quiz results
+        quiz_result = {
+            "quiz_id": quiz.get("quiz_id"),
+            "score": score,
+            "total_questions": total_questions,
+            "percentage": percentage_score,
+            "passed": percentage_score >= 70,  # Assuming 70% is passing grade
+            "timer_expired": timer_expired,  # Record if quiz was auto-submitted due to time expiration
+            "time_taken": time_taken,  # Record time taken in seconds
+            "time_limit_seconds": total_seconds  # Record time limit in seconds
+        }
+        
+        # Save quiz result to student record
+        mongo.db.students.update_one(
+            {"email": user_email},
+            {"$set": {f"quiz_results.{roadmap_id}.{course_id}.{chapter_title}": quiz_result}}
+        )
+        
+        # If passed, mark chapter as completed
+        if percentage_score >= 70:
+            mongo.db.students.update_one(
+                {"email": user_email},
+                {"$set": {f"progress.{roadmap_id}.{course_id}.{chapter_title}": True}}
+            )
+            
+        return render_template("quiz_results.html", 
+                              quiz=quiz, 
+                              score=score, 
+                              total=total_questions, 
+                              percentage=percentage_score,
+                              passed=percentage_score >= 70,
+                              timer_expired=timer_expired,
+                              time_taken=time_taken,
+                              time_limit_seconds=total_seconds,
+                              roadmap_id=roadmap_id)
+    
+    return render_template("take_quiz.html", quiz=quiz, roadmap_id=roadmap_id, course_id=course_id, chapter_title=chapter_title)
+
+# Create Quiz (Admin)
+@app.route("/admin/create_quiz/<roadmap_id>/<course_id>/<chapter_title>", methods=["GET", "POST"])
+def create_quiz(roadmap_id, course_id, chapter_title):
+    if "admin" not in session:
+        return redirect(url_for("admin_login"))
+    
+    if request.method == "POST":
+        question_count = int(request.form.get("question_count", 0))
+        questions = []
+        time_limit = request.form.get("time_limit", "10:00")  # Default: 10 minutes
+        
+        for i in range(question_count):
+            question_text = request.form.get(f"question_{i}")
+            correct_answer = request.form.get(f"correct_answer_{i}")
+            options = []
+            
+            for j in range(4):  # Assuming 4 options per question
+                option = request.form.get(f"option_{i}_{j}")
+                if option:
+                    options.append(option)
+            
+            questions.append({
+                "question_text": question_text,
+                "options": options,
+                "correct_answer": correct_answer
+            })
+        
+        quiz = {
+            "quiz_id": os.urandom(8).hex(),
+            "roadmap_id": roadmap_id,
+            "course_id": course_id,
+            "chapter_title": chapter_title,
+            "questions": questions,
+            "passing_score": 70,  # Default passing score (70%)
+            "time_limit": time_limit  # Store the time limit
+        }
+        
+        # Check if quiz already exists and update it, or create new
+        existing_quiz = mongo.db.quizzes.find_one({
+            "roadmap_id": roadmap_id,
+            "course_id": course_id,
+            "chapter_title": chapter_title
+        })
+        
+        if existing_quiz:
+            mongo.db.quizzes.update_one(
+                {"quiz_id": existing_quiz["quiz_id"]},
+                {"$set": quiz}
+            )
+        else:
+            mongo.db.quizzes.insert_one(quiz)
+            
+        return redirect(url_for("admin_dashboard", message="Quiz created successfully"))
+    
+    # Get course and chapter details for context
+    course = mongo.db.courses.find_one({"course_id": course_id})
+    chapter = None
+    
+    if course:
+        for ch in course.get("chapters", []):
+            if ch["title"] == chapter_title:
+                chapter = ch
+                break
+    
+    return render_template("create_quiz.html", 
+                          roadmap_id=roadmap_id, 
+                          course_id=course_id, 
+                          chapter_title=chapter_title,
+                          course=course,
+                          chapter=chapter)
+
+# Quiz Results Dashboard for Students
+@app.route("/student/quiz_results")
+def student_quiz_results():
+    if "user" not in session:
+        return redirect(url_for("student_login"))
+    
+    user_email = session["user"]
+    student = mongo.db.students.find_one({"email": user_email})
+    
+    quiz_results = student.get("quiz_results", {})
+    
+    # Get roadmap and course details for display
+    roadmap_details = {}
+    for roadmap_id in quiz_results.keys():
+        roadmap = mongo.db.roadmaps.find_one({"roadmap_id": roadmap_id})
+        if roadmap:
+            roadmap_details[roadmap_id] = {
+                "title": roadmap.get("title"),
+                "courses": {}
+            }
+            
+            for course_id in quiz_results[roadmap_id].keys():
+                course = mongo.db.courses.find_one({"course_id": course_id})
+                if course:
+                    roadmap_details[roadmap_id]["courses"][course_id] = course.get("name")
+    
+    return render_template("student_quiz_results.html", 
+                          quiz_results=quiz_results,
+                          roadmap_details=roadmap_details)
 # Student Dashboard
 @app.route("/student/dashboard")
 def student_dashboard():

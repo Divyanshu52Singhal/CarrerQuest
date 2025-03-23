@@ -1,0 +1,21 @@
+<!-- no_quiz.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Quiz Available</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>No Quiz Available</h1>
+        <p>There is currently no quiz available for this chapter.</p>
+        <p>Please check back later or contact an administrator.</p>
+        
+        <div class="actions">
+            <a href="{{ url_for('view_roadmap', roadmap_id=roadmap_id) }}" class="btn primary">Back to Roadmap</a>
+        </div>
+    </div>
+</body>
+</html>

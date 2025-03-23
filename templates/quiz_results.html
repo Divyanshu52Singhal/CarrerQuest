@@ -1,0 +1,84 @@
+<!-- quiz_results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .result-card {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .score-display {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .timer-expired {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 5px;
+        }
+        .time-info {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Results</h1>
+        <h2>{{ quiz.chapter_title }}</h2>
+        
+        <div class="result-card {% if passed %}pass{% else %}fail{% endif %}">
+            <h2>{% if passed %}Congratulations! You Passed{% else %}You Did Not Pass{% endif %}</h2>
+            
+            <div class="score-display">
+                {{ score }} / {{ total }} ({{ percentage|round|int }}%)
+            </div>
+            
+            <p>Required to pass: 70%</p>
+            
+            <div class="time-info">
+                {% set minutes = (time_taken / 60)|int %}
+                {% set seconds = time_taken % 60 %}
+                Time taken: {{ minutes }}m {{ seconds }}s
+                
+                {% set time_limit_minutes = (time_limit_seconds / 60)|int %}
+                {% set time_limit_seconds = time_limit_seconds % 60 %}
+                (Time limit: {{ time_limit_minutes }}m {{ time_limit_seconds }}s)
+            </div>
+            
+            {% if timer_expired %}
+            <div class="timer-expired">
+                <strong>Note:</strong> Your quiz was automatically submitted because the time limit was reached.
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="actions">
+            {% if passed %}
+            <a href="{{ url_for('view_roadmap', roadmap_id=roadmap_id) }}" class="btn primary">Continue Learning</a>
+            {% else %}
+            <a href="{{ url_for('take_chapter_quiz', roadmap_id=roadmap_id, course_id=quiz.course_id, chapter_title=quiz.chapter_title) }}" class="btn primary">Retry Quiz</a>
+            {% endif %}
+            <a href="{{ url_for('student_dashboard') }}" class="btn">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
