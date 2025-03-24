@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .form-section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .dynamic-section {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .remove-btn {
+            background-color: #f44336;
+            margin-top: 10px;
+        }
+        .add-btn {
+            background-color: #2196F3;
+            margin-top: 10px;
+        }
+        .bullet-items {
+            margin-top: 10px;
+        }
+        .bullet-item {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        .bullet-item input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .response-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+            font-family: monospace;
+            display: none;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Resume Generator</h1>
+    <p>Fill out the form below to generate your resume</p>
+    
+    <form id="resumeForm">
+        <!-- Personal Information -->
+        <div class="form-section">
+            <h2>Personal Information</h2>
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="linkedin_url">LinkedIn URL</label>
+                <input type="url" id="linkedin_url" name="linkedin_url">
+            </div>
+            <div class="form-group">
+                <label for="linkedin_display">LinkedIn Display Text</label>
+                <input type="text" id="linkedin_display" name="linkedin_display">
+            </div>
+            <div class="form-group">
+                <label for="github_url">GitHub URL</label>
+                <input type="url" id="github_url" name="github_url">
+            </div>
+            <div class="form-group">
+                <label for="github_display">GitHub Display Text</label>
+                <input type="text" id="github_display" name="github_display">
+            </div>
+        </div>
+
+        <!-- Education -->
+        <div class="form-section">
+            <h2>Education</h2>
+            <div id="education-container"></div>
+            <button type="button" class="add-btn" id="add-education">Add Education</button>
+        </div>
+
+        <!-- Experience -->
+        <div class="form-section">
+            <h2>Experience</h2>
+            <div id="experience-container"></div>
+            <button type="button" class="add-btn" id="add-experience">Add Experience</button>
+        </div>
+
+        <!-- Projects -->
+        <div class="form-section">
+            <h2>Projects</h2>
+            <div id="project-container"></div>
+            <button type="button" class="add-btn" id="add-project">Add Project</button>
+        </div>
+
+        <!-- Skills -->
+        <div class="form-section">
+            <h2>Skills</h2>
+            <div id="skills-container">
+                <div class="form-group">
+                    <label for="skills-Languages">Languages (comma-separated)</label>
+                    <input type="text" id="skills-Languages" name="skills-Languages" placeholder="Java, Python, C/C++">
+                </div>
+                <div class="form-group">
+                    <label for="skills-Frameworks">Frameworks (comma-separated)</label>
+                    <input type="text" id="skills-Frameworks" name="skills-Frameworks" placeholder="React, Node.js, Flask">
+                </div>
+                <div class="form-group">
+                    <label for="skills-Developer-Tools">Developer Tools (comma-separated)</label>
+                    <input type="text" id="skills-Developer-Tools" name="skills-Developer-Tools" placeholder="Git, Docker, VS Code">
+                </div>
+                <div class="form-group">
+                    <label for="skills-Libraries">Libraries (comma-separated)</label>
+                    <input type="text" id="skills-Libraries" name="skills-Libraries" placeholder="pandas, NumPy, Matplotlib">
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Sections -->
+        <div class="form-section">
+            <h2>Certifications</h2>
+            <div id="certifications-container">
+                <div class="form-group">
+                    <label for="cert-AWS">AWS (comma-separated)</label>
+                    <input type="text" id="cert-AWS" name="cert-AWS" placeholder="Solutions Architect Associate, Developer Associate">
+                </div>
+                <div class="form-group">
+                    <label for="cert-Microsoft">Microsoft (comma-separated)</label>
+                    <input type="text" id="cert-Microsoft" name="cert-Microsoft" placeholder="Azure Fundamentals, Power BI">
+                </div>
+                <div class="form-group">
+                    <label for="cert-Other">Other (comma-separated)</label>
+                    <input type="text" id="cert-Other" name="cert-Other" placeholder="CompTIA A+, ITIL Foundation">
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="button" id="previewBtn">Preview Resume</button>
+            <button type="button" id="generateBtn">Generate & Download Resume</button>
+        </div>
+    </form>
+
+    <div id="responseContainer" class="response-container"></div>
+
+    <script>
+        // Template for education item
+        function createEducationItem() {
+            const container = document.createElement('div');
+            container.className = 'dynamic-section';
+            container.innerHTML = `
+                <div class="form-group">
+                    <label>Institution</label>
+                    <input type="text" class="edu-institution" required>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" class="edu-location" required>
+                </div>
+                <div class="form-group">
+                    <label>Degree</label>
+                    <input type="text" class="edu-degree" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration</label>
+                    <input type="text" class="edu-duration" placeholder="Aug. 2018 -- May 2021" required>
+                </div>
+                <button type="button" class="remove-btn">Remove</button>
+            `;
+            container.querySelector('.remove-btn').addEventListener('click', function() {
+                container.remove();
+            });
+            return container;
+        }
+
+        // Template for experience item
+        function createExperienceItem() {
+            const container = document.createElement('div');
+            container.className = 'dynamic-section';
+            container.innerHTML = `
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" class="exp-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Organization</label>
+                    <input type="text" class="exp-organization" required>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" class="exp-location" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration</label>
+                    <input type="text" class="exp-duration" placeholder="June 2020 -- Present" required>
+                </div>
+                <div class="form-group">
+                    <label>Bullet Points</label>
+                    <div class="bullet-items"></div>
+                    <button type="button" class="add-bullet">Add Bullet Point</button>
+                </div>
+                <button type="button" class="remove-btn">Remove</button>
+            `;
+
+            const bulletContainer = container.querySelector('.bullet-items');
+            
+            // Add bullet functionality
+            container.querySelector('.add-bullet').addEventListener('click', function() {
+                addBulletItem(bulletContainer);
+            });
+
+            // Add first bullet by default
+            addBulletItem(bulletContainer);
+
+            // Remove functionality
+            container.querySelector('.remove-btn').addEventListener('click', function() {
+                container.remove();
+            });
+
+            return container;
+        }
+
+        // Template for project item
+        function createProjectItem() {
+            const container = document.createElement('div');
+            container.className = 'dynamic-section';
+            container.innerHTML = `
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" class="proj-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Technologies</label>
+                    <input type="text" class="proj-technologies" placeholder="Python, Flask, React" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration</label>
+                    <input type="text" class="proj-duration" placeholder="June 2020 -- Present" required>
+                </div>
+                <div class="form-group">
+                    <label>Bullet Points</label>
+                    <div class="bullet-items"></div>
+                    <button type="button" class="add-bullet">Add Bullet Point</button>
+                </div>
+                <button type="button" class="remove-btn">Remove</button>
+            `;
+
+            const bulletContainer = container.querySelector('.bullet-items');
+            
+            // Add bullet functionality
+            container.querySelector('.add-bullet').addEventListener('click', function() {
+                addBulletItem(bulletContainer);
+            });
+
+            // Add first bullet by default
+            addBulletItem(bulletContainer);
+
+            // Remove functionality
+            container.querySelector('.remove-btn').addEventListener('click', function() {
+                container.remove();
+            });
+
+            return container;
+        }
+
+        // Add bullet point function
+        function addBulletItem(container) {
+            const bulletItem = document.createElement('div');
+            bulletItem.className = 'bullet-item';
+            bulletItem.innerHTML = `
+                <input type="text" class="bullet-text" required>
+                <button type="button" class="remove-bullet">✕</button>
+            `;
+            
+            bulletItem.querySelector('.remove-bullet').addEventListener('click', function() {
+                bulletItem.remove();
+            });
+            
+            container.appendChild(bulletItem);
+        }
+
+        // Initialize form
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for the buttons
+            document.getElementById('add-education').addEventListener('click', function() {
+                document.getElementById('education-container').appendChild(createEducationItem());
+            });
+            
+            document.getElementById('add-experience').addEventListener('click', function() {
+                document.getElementById('experience-container').appendChild(createExperienceItem());
+            });
+            
+            document.getElementById('add-project').addEventListener('click', function() {
+                document.getElementById('project-container').appendChild(createProjectItem());
+            });
+
+            // Add default items
+            document.getElementById('add-education').click();
+            document.getElementById('add-experience').click();
+            document.getElementById('add-project').click();
+
+            // Preview button functionality
+            document.getElementById('previewBtn').addEventListener('click', function() {
+                const jsonData = buildJsonData();
+                
+                fetch('/preview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jsonData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const responseContainer = document.getElementById('responseContainer');
+                    responseContainer.style.display = 'block';
+                    responseContainer.textContent = data.content;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error previewing resume. Please check the console for details.');
+                });
+            });
+
+            // Generate & Download button functionality
+            document.getElementById('generateBtn').addEventListener('click', function() {
+                const jsonData = buildJsonData();
+                
+                fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jsonData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    // Create a temporary link to download the file
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'resume.tex';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    alert('Resume successfully generated and downloaded!');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error generating resume. Please check the console for details.');
+                });
+            });
+        });
+
+        // Build JSON data from form
+        function buildJsonData() {
+            // Personal Information
+            const jsonData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                linkedin_url: document.getElementById('linkedin_url').value,
+                linkedin_display: document.getElementById('linkedin_display').value,
+                github_url: document.getElementById('github_url').value,
+                github_display: document.getElementById('github_display').value,
+                education: [],
+                experience: [],
+                projects: [],
+                skills: {},
+                additional_sections: {
+                    Certifications: {}
+                }
+            };
+
+            // Education
+            document.querySelectorAll('#education-container .dynamic-section').forEach(section => {
+                jsonData.education.push({
+                    institution: section.querySelector('.edu-institution').value,
+                    location: section.querySelector('.edu-location').value,
+                    degree: section.querySelector('.edu-degree').value,
+                    duration: section.querySelector('.edu-duration').value
+                });
+            });
+
+            // Experience
+            document.querySelectorAll('#experience-container .dynamic-section').forEach(section => {
+                const bullets = [];
+                section.querySelectorAll('.bullet-text').forEach(bullet => {
+                    if (bullet.value.trim()) {
+                        bullets.push(bullet.value);
+                    }
+                });
+
+                jsonData.experience.push({
+                    title: section.querySelector('.exp-title').value,
+                    organization: section.querySelector('.exp-organization').value,
+                    location: section.querySelector('.exp-location').value,
+                    duration: section.querySelector('.exp-duration').value,
+                    bullets: bullets
+                });
+            });
+
+            // Projects
+            document.querySelectorAll('#project-container .dynamic-section').forEach(section => {
+                const bullets = [];
+                section.querySelectorAll('.bullet-text').forEach(bullet => {
+                    if (bullet.value.trim()) {
+                        bullets.push(bullet.value);
+                    }
+                });
+
+                jsonData.projects.push({
+                    name: section.querySelector('.proj-name').value,
+                    technologies: section.querySelector('.proj-technologies').value,
+                    duration: section.querySelector('.proj-duration').value,
+                    bullets: bullets
+                });
+            });
+
+            // Skills
+            const skillCategories = ['Languages', 'Frameworks', 'Developer Tools', 'Libraries'];
+            skillCategories.forEach(category => {
+                const inputId = 'skills-' + category.replace(' ', '-');
+                const input = document.getElementById(inputId);
+                if (input && input.value.trim()) {
+                    jsonData.skills[category] = input.value.split(',').map(item => item.trim());
+                }
+            });
+
+            // Certifications
+            const certCategories = ['AWS', 'Microsoft', 'Other'];
+            certCategories.forEach(category => {
+                const inputId = 'cert-' + category;
+                const input = document.getElementById(inputId);
+                if (input && input.value.trim()) {
+                    jsonData.additional_sections.Certifications[category] = input.value.split(',').map(item => item.trim());
+                }
+            });
+
+            return jsonData;
+        }
+    </script>
+</body>
+</html>
