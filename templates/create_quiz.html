@@ -1,0 +1,122 @@
+<!-- create_quiz.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Create Quiz</h1>
+        <h2>{{ course.name }} - {{ chapter_title }}</h2>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="time_limit">Time Limit (MM:SS):</label>
+                <input type="text" id="time_limit" name="time_limit" value="10:00" placeholder="MM:SS" 
+                       pattern="^([0-5]?[0-9]):([0-5]?[0-9])$" required>
+                <small>Format: Minutes:Seconds (example: 10:00 for 10 minutes)</small>
+            </div>
+            
+            <div id="questions-container">
+                <!-- Questions will be added here dynamically -->
+            </div>
+            
+            <input type="hidden" id="question_count" name="question_count" value="0">
+            
+            <div class="actions">
+                <button type="button" onclick="addQuestion()" class="btn">Add Question</button>
+                <button type="submit" class="btn primary">Save Quiz</button>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        let questionCounter = 0;
+        
+        function addQuestion() {
+            const container = document.getElementById('questions-container');
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question-card';
+            questionDiv.id = `question_${questionCounter}`;
+            
+            questionDiv.innerHTML = `
+                <h3>Question ${questionCounter + 1}</h3>
+                <div class="form-group">
+                    <label for="question_${questionCounter}">Question:</label>
+                    <textarea id="question_${questionCounter}" name="question_${questionCounter}" required></textarea>
+                </div>
+                
+                <div class="options-container">
+                    <h4>Options</h4>
+                    <div class="form-group">
+                        <label for="option_${questionCounter}_0">Option 1:</label>
+                        <input type="text" id="option_${questionCounter}_0" name="option_${questionCounter}_0" required>
+                        <input type="radio" name="correct_answer_${questionCounter}" value="" required checked
+                               onclick="this.value = document.getElementById('option_${questionCounter}_0').value">
+                        <label>Correct</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="option_${questionCounter}_1">Option 2:</label>
+                        <input type="text" id="option_${questionCounter}_1" name="option_${questionCounter}_1" required>
+                        <input type="radio" name="correct_answer_${questionCounter}" value=""
+                               onclick="this.value = document.getElementById('option_${questionCounter}_1').value">
+                        <label>Correct</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="option_${questionCounter}_2">Option 3:</label>
+                        <input type="text" id="option_${questionCounter}_2" name="option_${questionCounter}_2" required>
+                        <input type="radio" name="correct_answer_${questionCounter}" value=""
+                               onclick="this.value = document.getElementById('option_${questionCounter}_2').value">
+                        <label>Correct</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="option_${questionCounter}_3">Option 4:</label>
+                        <input type="text" id="option_${questionCounter}_3" name="option_${questionCounter}_3" required>
+                        <input type="radio" name="correct_answer_${questionCounter}" value=""
+                               onclick="this.value = document.getElementById('option_${questionCounter}_3').value">
+                        <label>Correct</label>
+                    </div>
+                </div>
+                
+                <button type="button" onclick="removeQuestion(${questionCounter})" class="btn danger">Remove Question</button>
+            `;
+            
+            container.appendChild(questionDiv);
+            questionCounter++;
+            document.getElementById('question_count').value = questionCounter;
+            
+            // Update option values when they change
+            for (let i = 0; i < 4; i++) {
+                const optionInput = document.getElementById(`option_${questionCounter-1}_${i}`);
+                optionInput.addEventListener('input', function() {
+                    const radio = document.querySelector(`input[type="radio"][name="correct_answer_${questionCounter-1}"][onclick*="option_${questionCounter-1}_${i}"]`);
+                    if (radio.checked) {
+                        radio.value = this.value;
+                    }
+                });
+            }
+        }
+        
+        function removeQuestion(index) {
+            const questionDiv = document.getElementById(`question_${index}`);
+            questionDiv.remove();
+            // Don't decrement questionCounter to keep IDs consistent
+            // Just update the total count
+            let visibleQuestions = document.querySelectorAll('.question-card').length;
+            document.getElementById('question_count').value = visibleQuestions;
+        }
+        
+        // Add the first question by default
+        window.onload = function() {
+            addQuestion();
+        };
+    </script>
+</body>
+</html>

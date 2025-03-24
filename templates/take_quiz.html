@@ -1,0 +1,201 @@
+<!-- take_quiz.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .timer-container {
+            background-color: #f5f5f5;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        .timer-icon {
+            margin-right: 10px;
+        }
+        .timer {
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz: {{ quiz.chapter_title }}</h1>
+        
+        <!-- Timer Display -->
+        <div class="timer-container">
+            <span class="timer-icon">⏱️</span>
+            <span>Time Remaining: <span id="timer" class="timer">{{ quiz.time_limit|default('1:00') }}</span></span>
+        </div>
+        
+        <p>Answer all questions to complete the quiz. You need 70% to pass.</p>
+        
+        <form method="POST" id="quizForm">
+            <input type="hidden" name="timer_expired" id="timerExpired" value="false">
+            <input type="hidden" name="time_taken" id="timeTaken" value="0">
+            
+            {% for question in quiz.questions %}
+            <div class="question-card">
+                <h3>Question {{ loop.index }}: {{ question.question_text }}</h3>
+                
+                {% for option in question.options %}
+                <div class="option">
+                    <input type="radio" id="q{{ loop.index0 }}_{{ loop.index0 }}" name="answer_{{ loop.index0 }}" value="{{ option }}" required>
+                    <label for="q{{ loop.index0 }}_{{ loop.index0 }}">{{ option }}</label>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            
+            <div class="actions">
+                <button type="submit" class="btn primary">Submit Quiz</button>
+                <a href="{{ url_for('view_roadmap', roadmap_id=roadmap_id) }}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Quiz ID to make storage unique per quiz
+            const quizId = "{{ quiz.quiz_id }}";
+            const quizStartKey = `quiz_${quizId}_start_time`;
+            const quizDurationKey = `quiz_${quizId}_duration`;
+            
+            // Parse time limit from server (format: MM:SS)
+            const timerElement = document.getElementById('timer');
+            const initialTime = timerElement.textContent.trim();
+            let [minutes, seconds] = initialTime.split(':').map(num => parseInt(num));
+            
+            // Calculate total seconds for this quiz
+            const quizTotalSeconds = minutes * 60 + seconds;
+            
+            // Check if quiz has already started
+            let startTime = localStorage.getItem(quizStartKey);
+            let currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+            let elapsedSeconds = 0;
+            let remainingSeconds = quizTotalSeconds;
+            
+            // If quiz already started, calculate remaining time
+            if (startTime) {
+                startTime = parseInt(startTime);
+                elapsedSeconds = currentTime - startTime;
+                remainingSeconds = quizTotalSeconds - elapsedSeconds;
+                
+                // If time is already up, submit immediately
+                if (remainingSeconds <= 0) {
+                    document.getElementById('timerExpired').value = 'true';
+                    document.getElementById('timeTaken').value = quizTotalSeconds;
+                    document.getElementById('quizForm').submit();
+                    return;
+                }
+            } else {
+                // First time starting the quiz
+                startTime = currentTime;
+                localStorage.setItem(quizStartKey, startTime.toString());
+                localStorage.setItem(quizDurationKey, quizTotalSeconds.toString());
+            }
+            
+            // Update timer display immediately
+            minutes = Math.floor(remainingSeconds / 60);
+            seconds = remainingSeconds % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Change color to red when less than 1 minute remains
+            if (remainingSeconds < 60) {
+                timerElement.style.color = '#ff0000';
+            }
+            
+            // Setup timer interval
+            const timer = setInterval(function() {
+                remainingSeconds--;
+                
+                // Save responses to localStorage periodically to restore them on refresh
+                saveResponses();
+                
+                if (remainingSeconds <= 0) {
+                    clearInterval(timer);
+                    // Set flag for server to know timer expired
+                    document.getElementById('timerExpired').value = 'true';
+                    document.getElementById('timeTaken').value = quizTotalSeconds;
+                    
+                    // Remove localStorage data before submitting
+                    localStorage.removeItem(quizStartKey);
+                    localStorage.removeItem(quizDurationKey);
+                    clearSavedResponses();
+                    
+                    // Auto-submit the form
+                    document.getElementById('quizForm').submit();
+                }
+                
+                // Update timer display
+                minutes = Math.floor(remainingSeconds / 60);
+                seconds = remainingSeconds % 60;
+                
+                // Format display with leading zeros
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Change color to red when less than 1 minute remains
+                if (remainingSeconds < 60) {
+                    timerElement.style.color = '#ff0000';
+                }
+            }, 1000);
+            
+            // Save quiz responses to localStorage
+            function saveResponses() {
+                const form = document.getElementById('quizForm');
+                const radioButtons = form.querySelectorAll('input[type="radio"]:checked');
+                const responses = {};
+                
+                radioButtons.forEach(radio => {
+                    responses[radio.name] = radio.value;
+                });
+                
+                localStorage.setItem(`quiz_${quizId}_responses`, JSON.stringify(responses));
+            }
+            
+            // Restore responses from localStorage if page is refreshed
+            function restoreResponses() {
+                const savedResponses = localStorage.getItem(`quiz_${quizId}_responses`);
+                if (savedResponses) {
+                    const responses = JSON.parse(savedResponses);
+                    
+                    for (const [name, value] of Object.entries(responses)) {
+                        const radioButtons = document.querySelectorAll(`input[name="${name}"]`);
+                        radioButtons.forEach(radio => {
+                            if (radio.value === value) {
+                                radio.checked = true;
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // Clear saved responses
+            function clearSavedResponses() {
+                localStorage.removeItem(`quiz_${quizId}_responses`);
+            }
+            
+            // Add event listener for form submission
+            document.getElementById('quizForm').addEventListener('submit', function() {
+                // Calculate time taken in seconds
+                document.getElementById('timeTaken').value = quizTotalSeconds - remainingSeconds;
+                
+                // Clean up localStorage
+                localStorage.removeItem(quizStartKey);
+                localStorage.removeItem(quizDurationKey);
+                clearSavedResponses();
+            });
+            
+            // Restore responses if page was refreshed
+            restoreResponses();
+        });
+    </script>
+</body>
+</html>

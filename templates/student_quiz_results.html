@@ -1,0 +1,57 @@
+<!-- student_quiz_results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>My Quiz Results</h1>
+        
+        {% for roadmap_id, roadmap in roadmap_details.items() %}
+        <div class="roadmap-section">
+            <h2>{{ roadmap.title }}</h2>
+            
+            {% for course_id, course_name in roadmap.courses.items() %}
+            <div class="course-card">
+                <h3>{{ course_name }}</h3>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Chapter</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for chapter_title, result in quiz_results[roadmap_id][course_id].items() %}
+                        <tr>
+                            <td>{{ chapter_title }}</td>
+                            <td>{{ result.score }}/{{ result.total_questions }} ({{ result.percentage|round(1) }}%)</td>
+                            <td class="status {% if result.passed %}passed{% else %}failed{% endif %}">
+                                {{ "Passed" if result.passed else "Failed" }}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('take_chapter_quiz', roadmap_id=roadmap_id, course_id=course_id, chapter_title=chapter_title) }}" class="btn small">
+                                    {{ "Review" if result.passed else "Retry" }}
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        
+        <div class="actions">
+            <a href="{{ url_for('student_dashboard') }}" class="btn primary">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
