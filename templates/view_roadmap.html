@@ -1,52 +1,64 @@
 {% extends "base.html" %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/roadmap_detail.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<h1>{{ roadmap.title }}</h1>
-<p>{{ roadmap.description }}</p>
-{% if message %}
-<div class="alert alert-success" role="alert">
-    {{ message }}
+<div class="container">
+    <h1>{{ roadmap.title }}</h1>
+    <p>{{ roadmap.description }}</p>
+
+    {% if message %}
+    <div class="alert alert-success" role="alert">
+        {{ message }}
+    </div>
+    {% endif %}
+
+    <h2>Courses in this Roadmap</h2>
+    {% if courses %}
+        <ul class="roadmap-courses">
+            {% for course in courses %}
+                <li class="course-item">
+                    <strong>{{ course.name }}</strong>
+                    <ul class="course-chapters">
+                        {% for chapter in course.chapters %}
+                            <li class="chapter-item">
+                                <form method="POST" action="{{ url_for('update_chapter_status') }}" class="chapter-form">
+                                    <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                                    <input type="hidden" name="roadmap_id" value="{{ roadmap.roadmap_id }}">
+                                    <input type="hidden" name="chapter_title" value="{{ chapter.title }}">
+                                    <input type="hidden" name="completed" value="{% if not chapter.completed %}true{% else %}false{% endif %}">
+                                    
+                                    <button type="submit" class="btn {% if chapter.completed %}btn-success{% else %}btn-secondary{% endif %}">
+                                        {% if chapter.completed %}Mark Incomplete{% else %}Mark Complete{% endif %}
+                                    </button>
+                                    
+                                    {{ chapter.title }}
+                                    
+                                    {% if chapter.link %}
+                                    <a href="{% if '://' in chapter.link %}{{ chapter.link }}{% else %}https://{{ chapter.link }}{% endif %}" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer"
+                                       class="btn btn-primary btn-sm">
+                                       Reference
+                                    </a>
+                                    {% endif %} 
+                                    
+                                    <a href="{{ url_for('take_chapter_quiz', roadmap_id=roadmap.roadmap_id, course_id=course.course_id, chapter_title=chapter.title) }}" 
+                                       class="btn btn-primary btn-sm">
+                                       Take Quiz
+                                    </a>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-state">No courses available in this roadmap.</p>
+    {% endif %}
 </div>
-{% endif %}
-<h2>Courses in this Roadmap</h2>
-{% if courses %}
-    <ul>
-        {% for course in courses %}
-            <li>
-                <strong>{{ course.name }}</strong>
-                <ul>
-                    {% for chapter in course.chapters %}
-                        <li>
-                            <form method="POST" action="{{ url_for('update_chapter_status') }}">
-                                <input type="hidden" name="course_id" value="{{ course.course_id }}">
-                                <input type="hidden" name="roadmap_id" value="{{ roadmap.roadmap_id }}">
-                                <input type="hidden" name="chapter_title" value="{{ chapter.title }}">
-                                <input type="hidden" name="completed" value="{% if not chapter.completed %}true{% else %}false{% endif %}">
-                                <button type="submit" class="{% if chapter.completed %}btn btn-success{% else %}btn btn-secondary{% endif %}">
-                                    {% if chapter.completed %}Mark Incomplete{% else %}Mark Complete{% endif %}
-                                </button>
-                                {{ chapter.title }}
-                                {% if chapter.link %}
-                                <a href="{% if '://' in chapter.link %}{{ chapter.link }}{% else %}https://{{ chapter.link }}{% endif %}" 
-                                   target="_blank" 
-                                   rel="noopener noreferrer">
-                                   Reference
-                                </a>
-                                {% endif %} 
-                                
-                                <!-- Add this new Quiz button -->
-                                <a href="{{ url_for('take_chapter_quiz', roadmap_id=roadmap.roadmap_id, course_id=course.course_id, chapter_title=chapter.title) }}" 
-                                   class="btn btn-primary btn-sm">
-                                   Take Quiz
-                                </a>
-                            </form>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No courses available in this roadmap.</p>
-{% endif %}
 {% endblock %}

@@ -1,38 +1,60 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1>Welcome, {{ user.email }}</h1>
-<h2>Subscribed Roadmaps</h2>
-{% if subscribed_roadmaps %}
-    <ul>
-        {% for roadmap in subscribed_roadmaps %}
-            <li>
-                <strong>{{ roadmap.title }}</strong>: {{ roadmap.description }}
-                <form method="POST" action="{{ url_for('view_roadmap', roadmap_id=roadmap.roadmap_id) }}">
-                    <a href="{{ url_for('view_roadmap', roadmap_id=roadmap.roadmap_id) }}">
-                        <button type="button">Explore</button>
-                    </a>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>You haven't subscribed to any roadmaps yet.</p>
-{% endif %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/roadmaps.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-<h2>Available Roadmaps to Subscribe</h2>
-{% if unsubscribed_roadmaps %}
-    <ul>
-        {% for roadmap in unsubscribed_roadmaps %}
-            <li>
-                <strong>{{ roadmap.title }}</strong>: {{ roadmap.description }}
-                <form method="POST" action="{{ url_for('subscribe_roadmap', roadmap_id=roadmap.roadmap_id) }}">
-                    <button type="submit">Subscribe</button>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No roadmaps available for subscription.</p>
-{% endif %}
+{% endblock %}
+{% block title %}Student Dashboard
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Welcome, {{ user.email }}</h1>
+
+    <div class="roadmap-section">
+        <h2>Subscribed Roadmaps</h2>
+        {% if subscribed_roadmaps %}
+            <div class="roadmap-grid">
+                {% for roadmap in subscribed_roadmaps %}
+                    <div class="roadmap-card">
+                        <h3>{{ roadmap.title }}</h3>
+                        <p>{{ roadmap.description }}</p>
+                        <div class="roadmap-actions">
+                            <a href="{{ url_for('view_roadmap', roadmap_id=roadmap.roadmap_id) }}" class="btn btn-primary">
+                                Explore Roadmap
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p>You haven't subscribed to any roadmaps yet.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="roadmap-section">
+        <h2>Available Roadmaps to Subscribe</h2>
+        {% if unsubscribed_roadmaps %}
+            <div class="roadmap-grid">
+                {% for roadmap in unsubscribed_roadmaps %}
+                    <div class="roadmap-card">
+                        <h3>{{ roadmap.title }}</h3>
+                        <p>{{ roadmap.description }}</p>
+                        <div class="roadmap-actions">
+                            <form method="POST" action="{{ url_for('subscribe_roadmap', roadmap_id=roadmap.roadmap_id) }}">
+                                <button type="submit" class="btn btn-primary">Subscribe</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <p>No roadmaps available for subscription.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

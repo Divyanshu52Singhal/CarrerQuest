@@ -1,20 +1,25 @@
 {% extends "base.html" %}
 
+{% block styles %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edit_roadmap.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="my-2">Edit Roadmap</h2>
+            <div class="card position-relative">
+                <div class="card-header">
+                    <h2>Edit Roadmap</h2>
                 </div>
                 <div class="card-body">
                     <form action="{{ url_for('admin_edit_roadmap', roadmap_id=roadmap['roadmap_id']) }}" method="POST">
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="title" class="form-label">Roadmap Title</label>
                             <input type="text" class="form-control" id="title" name="title" value="{{ roadmap['title'] }}" required>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="description" class="form-label">Description</label>
                             <textarea class="form-control" id="description" name="description" rows="4" required>{{ roadmap['description'] }}</textarea>
                         </div>
@@ -23,7 +28,6 @@
                             <button type="submit" class="btn btn-primary">Update Roadmap</button>
                             <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
                             
-                            <!-- Delete button with confirmation modal trigger -->
                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRoadmapModal">
                                 Delete Roadmap
                             </button>
@@ -39,7 +43,7 @@
 <div class="modal fade" id="deleteRoadmapModal" tabindex="-1" aria-labelledby="deleteRoadmapModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
+            <div class="modal-header">
                 <h5 class="modal-title" id="deleteRoadmapModalLabel">Confirm Deletion</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
