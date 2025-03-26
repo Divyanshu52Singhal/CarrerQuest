@@ -9,6 +9,21 @@
     --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
+/* Add background gradient to the webpage */
+body {
+    background: linear-gradient(135deg, #C4B5FD, #93C5FD);
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Center the page header */
+.page-header {
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 2rem;
+    margin: var(--spacing) 0;
+}
+
 .roadmap-form {
     max-width: 500px;
     margin: 0 auto;

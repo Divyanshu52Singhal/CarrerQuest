@@ -18,6 +18,19 @@
     box-shadow: var(--shadow);
 }
 
+.page-title {
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 3rem;
+    margin: var(--spacing) 0;
+}
+
+
+body {
+    background: linear-gradient(135deg, #C4B5FD, #93C5FD);
+    margin: 0;
+}
+
 .form-group {
     margin-bottom: calc(var(--spacing) * 1.5);
 }

@@ -22,6 +22,7 @@ body {
     background-color: var(--background-color);
     color: var(--text-primary);
     line-height: 1.6;
+    background: linear-gradient(135deg, #C4B5FD, #93C5FD);
 }
 
 /* Container Styles */
@@ -33,10 +34,10 @@ body {
 
 /* Title Styles */
 .dashboard-title {
-    font-size: 2.5rem;
+    font-size: 3.5rem;
     margin-bottom: var(--spacing);
     font-weight: 700;
-    background: var(--gradient);
+    background: var(--text-primary);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
