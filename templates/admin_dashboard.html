@@ -1,301 +1,494 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}Admin Dashboard{% endblock %} {%
+block styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/admin_dashboard.css') }}"
+/>
+{% endblock %} {% block content %}
 
-{% block title %}Admin Login{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin_dashboard.css') }}"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="admin-container">
+      <h1 class="dashboard-title">Admin Dashboard</h1>
 
-{% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
-<style>
-    .action-buttons {
-        display: flex;
-        gap: 8px;
-        margin-top: 8px;
-    }
-    .edit-button {
-        padding: 4px 8px;
-        font-size: 0.9em;
-    }
-    .secondary-button {
-        background-color: #5a6268;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .edit-button:hover {
-        background-color: #4c545a;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<h1>Admin Dashboard</h1>
-
-<!-- Roadmaps Section -->
-<div class="dashboard-section">
-    <h3 class="section-title">Roadmaps</h3>
-    <div id="roadmap-section">
-        {% for roadmap in roadmaps %}
-            <div class="roadmap-card">
-                <div class="roadmap-header">
-                    <button class="toggle-button gradient-button" onclick="toggleVisibility('roadmap-{{ loop.index }}')">
-                        {{ roadmap.title }}
-                    </button>
-                    <span class="roadmap-description">&#8594; {{ roadmap.description }}</span>
-                </div>
-                
-                <div class="action-buttons">
-                    <a href="{{ url_for('admin_edit_roadmap', roadmap_id=roadmap.roadmap_id) }}" 
-                       class="edit-button secondary-button">
-                       Edit Roadmap
-                    </a>
-                </div>
-
-                <div id="roadmap-{{ loop.index }}" class="collapsible-content" style="display: none;">
-                    <ul class="course-list">
-                        {% for course in roadmap.courses %}
-                            <li class="course-item">
-                                <div class="course-header">
-                                    <strong>{{ course.name }}</strong>
-                                    <p class="course-description">{{ course.description }}</p>
-                                    <div class="action-buttons">
-                                        <button class="toggle-button secondary-button" onclick="toggleVisibility('course-{{ course.name}}')">
-                                            View Chapters
-                                        </button>
-                                        <a href="{{ url_for('admin_edit_course', roadmap_id=roadmap.roadmap_id, course_id=course.course_id) }}" 
-                                           class="edit-button secondary-button">
-                                           Edit Course
-                                        </a>
-                                    </div>
-                                </div>
-                                <ul id="course-{{course.name}}" class="chapter-list collapsible-content" style="display: none;">
-                                    {% for chapter in course.chapters %}
-                                        <li class="chapter-item">{{ chapter.title }} - {% if chapter.link %}
-                                            <a href="{% if '://' in chapter.link %}{{ chapter.link }}{% else %}https://{{ chapter.link }}{% endif %}" 
-                                               target="_blank" 
-                                               rel="noopener noreferrer">
-                                               Reference
-                                            </a>
-                                            
-                                        {% endif %}
-                                        <a href="{{ url_for('create_quiz', roadmap_id=roadmap.roadmap_id, course_id=course.course_id, chapter_title=chapter.title) }}" 
-                                        class="btn btn-sm btn-secondary">
-                                        Create/Edit Quiz
-                                     </a></li>
-                                    {% endfor %}
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+      <!-- Roadmaps Section -->
+      <!-- Roadmaps Section -->
+      <div class="dashboard-section">
+        <h3 class="section-title">Roadmaps</h3>
+        <div id="roadmap-section">
+          {% for roadmap in roadmaps %}
+          <div class="roadmap-card">
+            <div class="roadmap-header">
+              <button
+                class="toggle-button gradient-button"
+                onclick="toggleVisibility('roadmap-{{ loop.index }}')"
+              >
+                {{ roadmap.title }}
+              </button>
+              <span class="roadmap-description"
+                >&#8594; {{ roadmap.description }}</span
+              >
             </div>
-        {% endfor %}
-    </div>
-</div>
-
-
-<!-- Students Section -->
-<div class="dashboard-section">
-    <h3 class="section-title">Sort and Filter Students</h3>
-    <form id="sorting-form" class="control-panel">
-        <div id="sort-criteria-container" class="sort-section">
-            <label class="control-label">Sort by:</label>
-            <button type="button" class="add-criteria-button gradient-button" onclick="addSortCriteria()">
-                Add Criteria
-            </button>
+            <div class="action-buttons">
+              <a
+                href="{{ url_for('admin_edit_roadmap', roadmap_id=roadmap.roadmap_id) }}"
+                class="edit-button secondary-button"
+              >
+                Edit Roadmap
+              </a>
+            </div>
+            <div
+              id="roadmap-{{ loop.index }}"
+              class="collapsible-content"
+              style="display: none"
+            >
+              <ul class="course-list">
+                {% for course in roadmap.courses %}
+                <li class="course-item">
+                  <div class="course-header">
+                    <strong>{{ course.name }}</strong>
+                    <p class="course-description">{{ course.description }}</p>
+                    <div class="action-buttons">
+                      <button
+                        class="toggle-button secondary-button"
+                        onclick="toggleVisibility('course-{{ course.name}}')"
+                      >
+                        View Chapters
+                      </button>
+                      <a
+                        href="{{ url_for('admin_edit_course', roadmap_id=roadmap.roadmap_id, course_id=course.course_id) }}"
+                        class="edit-button secondary-button"
+                      >
+                        Edit Course
+                      </a>
+                    </div>
+                  </div>
+                  <ul id="course-{{course.name}}" class="chapter-list collapsible-content" style="display: none;">
+                    {% for chapter in course.chapters %}
+                    <li class="chapter-item">
+                        <div class="chapter-item-header">
+                            <span class="chapter-item-title">{{ chapter.title }}</span>
+                            <div class="chapter-item-actions">
+                                {% if chapter.link %}
+                                <a href="{% if '://' in chapter.link %}{{ chapter.link }}{% else %}https://{{ chapter.link }}{% endif %}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   class="chapter-item-reference">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                    </svg>
+                                    Reference
+                                </a>
+                                {% endif %}
+                                <a href="{{ url_for('create_quiz', roadmap_id=roadmap.roadmap_id, course_id=course.course_id, chapter_title=chapter.title) }}" 
+                                   class="btn btn-sm btn-secondary">
+                                    Create Quiz</a>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endfor %}
         </div>
+      </div>
 
-        <div id="filter-columns-container" class="filter-section">
+      <!-- Students Section -->
+      <div class="dashboard-section">
+        <h3 class="section-title">Sort and Filter Students</h3>
+        <form id="sorting-form" class="control-panel">
+          <div id="sort-criteria-container" class="sort-section">
+            <label class="control-label">Sort by:</label>
+            <button
+              type="button"
+              class="gradient-button"
+              onclick="addSortCriteria()"
+            >
+              Add Criteria
+            </button>
+          </div>
+
+          <div id="filter-columns-container" class="filter-section">
             <label class="control-label">Filter Columns:</label>
             <div class="checkbox-group">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="filter-name" checked> Name
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="filter-email" checked> Email
-                </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="filter-cgpa" checked> CGPA
-                </label>
-                {% for roadmap in roadmaps %}
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="filter-{{ roadmap.roadmap_id }}" checked> 
-                        {{ roadmap.title }} Completion Rate
-                    </label>
-                {% endfor %}
+              <label class="checkbox-label">
+                <input type="checkbox" id="filter-name" checked /> Name
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="filter-email" checked /> Email
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="filter-cgpa" checked /> CGPA
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="filter-gvishwanthan" checked />
+                GVishwanthan Challenge
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="filter-dsa" checked /> DSA Completion
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="filter-cloud" checked /> Cloud
+                Computing
+              </label>
             </div>
-        </div>
+          </div>
 
-        <div class="filter-top-section">
+          <div class="filter-top-section">
             <label class="control-label">Top Candidates:</label>
-            <input type="number" id="top-candidates-number" placeholder="Enter number" min="1">
-            <button type="button" id="filter-top-button" class="filter-top-button gradient-button">Filter Top Candidates</button>
+            <input
+              type="number"
+              id="top-candidates-number"
+              placeholder="Enter number"
+              min="1"
+            />
+            <button
+              type="button"
+              id="filter-top-button"
+              class="gradient-button"
+            >
+              Filter Top Candidates
+            </button>
+          </div>
+
+          <div class="action-buttons">
+            <button type="button" id="apply-button" class="gradient-button">
+              Apply
+            </button>
+            <button
+              type="button"
+              id="export-csv-button"
+              class="gradient-button"
+            >
+              Export to CSV
+            </button>
+          </div>
+        </form>
+
+        <div class="chart-container">
+          <canvas id="performanceChart"></canvas>
         </div>
 
-        <button type="button" id="apply-button" class="apply-button gradient-button">Apply</button>
-        <button type="button" id="export-csv-button" class="export-csv-button gradient-button">Export to CSV</button>
-    </form>
-
-    <div class="table-container">
-        <table id="students-table">
+        <div class="table-container">
+          <table id="students-table">
             <thead>
-                <tr>
-                    <th class="column-name">Name</th>
-                    <th class="column-email">Email</th>
-                    <th class="column-cgpa">CGPA</th>
-                    {% for roadmap in roadmaps %}
-                        <th class="column-{{ roadmap.roadmap_id }}">{{ roadmap.title }} Completion Rate</th>
-                    {% endfor %}
-                </tr>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>CGPA</th>
+                <th>GVishwanthan Challenge</th>
+                <th>DSA Completion</th>
+                <th>Cloud Computing</th>
+              </tr>
             </thead>
             <tbody>
-                <!-- Populated dynamically by JavaScript -->
+              <tr>
+                <td>Student1</td>
+                <td>student1@gmail.com</td>
+                <td>9.0</td>
+                <td>3%</td>
+                <td>100%</td>
+                <td>0%</td>
+              </tr>
+              <tr>
+                <td>Student2</td>
+                <td>student2@gmail.com</td>
+                <td>8.7</td>
+                <td>0%</td>
+                <td>40%</td>
+                <td>0%</td>
+              </tr>
+              <tr>
+                <td>Akhand</td>
+                <td>student3@gmail.com</td>
+                <td>8.5</td>
+                <td>0%</td>
+                <td>0%</td>
+                <td>30%</td>
+              </tr>
+              <tr>
+                <td>Aastha</td>
+                <td>student4@gmail.com</td>
+                <td>9.7</td>
+                <td>0%</td>
+                <td>80%</td>
+                <td>40%</td>
+              </tr>
+              <tr>
+                <td>Hitesh</td>
+                <td>student5@gmail.com</td>
+                <td>9.6</td>
+                <td>0%</td>
+                <td>0%</td>
+                <td>30.7%</td>
+              </tr>
             </tbody>
-        </table>
+          </table>
+        </div>
+      </div>
     </div>
-</div>
-</div>
 
-<script>
-    function toggleVisibility(id) {
+    <script>
+      // Roadmap Toggle Functionality
+      function toggleVisibility(id) {
         const element = document.getElementById(id);
         if (element.style.display === "none" || element.style.display === "") {
-            element.style.display = "block";
+          element.style.display = "block";
         } else {
-            element.style.display = "none";
+          element.style.display = "none";
         }
-    }
+      }
 
-    // Pass data from Python to JavaScript
-    const students = JSON.parse('{{ students_data|tojson|safe }}');
-    const roadmaps = JSON.parse('{{ roadmaps|tojson|safe }}');
+      // Performance Chart
+      const ctx = document.getElementById("performanceChart").getContext("2d");
+      const performanceChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: ["Student1", "Student2", "Akhand", "Aastha", "Hitesh"],
+          datasets: [
+            {
+              label: "GVishwanthan Challenge",
+              data: [3, 0, 0, 0, 0],
+              backgroundColor: "rgba(75, 192, 192, 0.6)",
+            },
+            {
+              label: "DSA Completion",
+              data: [100, 40, 0, 80, 0],
+              backgroundColor: "rgba(255, 99, 132, 0.6)",
+            },
+            {
+              label: "Cloud Computing",
+              data: [0, 0, 30, 40, 30.7],
+              backgroundColor: "rgba(54, 162, 235, 0.6)",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+            },
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: "Student Performance Across Roadmaps",
+            },
+          },
+        },
+      });
 
-    // Function to display students
-    function displayStudents(data) {
-        const tableBody = document.getElementById("students-table").querySelector("tbody");
-        tableBody.innerHTML = ""; // Clear existing rows
+      // Students Data
+      const students = [
+        {
+          name: "Student1",
+          email: "student1@gmail.com",
+          cgpa: 9.0,
+          gvishwanthan: 3,
+          dsa: 100,
+          cloud: 0,
+        },
+        {
+          name: "Student2",
+          email: "student2@gmail.com",
+          cgpa: 8.7,
+          gvishwanthan: 0,
+          dsa: 40,
+          cloud: 0,
+        },
+        {
+          name: "Akhand",
+          email: "student3@gmail.com",
+          cgpa: 8.5,
+          gvishwanthan: 0,
+          dsa: 50,
+          cloud: 30,
+        },
+        {
+          name: "Aastha",
+          email: "student4@gmail.com",
+          cgpa: 9.7,
+          gvishwanthan: 0,
+          dsa: 80,
+          cloud: 40,
+        },
+        {
+          name: "Hitesh",
+          email: "student5@gmail.com",
+          cgpa: 9.6,
+          gvishwanthan: 0,
+          dsa: 0,
+          cloud: 30.7,
+        },
+      ];
 
-        data.forEach(student => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td class="column-name">${student.name}</td>
-                <td class="column-email">${student.email}</td>
-                <td class="column-cgpa">${student.cgpa}</td>
-                ${roadmaps.map(roadmap => {
-                    const completionRate = student.completion_rate[roadmap.roadmap_id] || 0;
-                    return `<td class="column-${roadmap.roadmap_id}">${completionRate}%</td>`;
-                }).join('')}
-            `;
-            tableBody.appendChild(row);
-        });
-
-        // Apply column filters
-        applyColumnFilters();
-    }
-
-    // Dynamic sorting function
-    function dynamicSort(keys) {
-        return function(a, b) {
-            for (let key of keys) {
-                let aValue, bValue, order;
-                if (key.endsWith('asc')) {
-                    order = 'asc';
-                    key = key.slice(0, -4);
-                } else {
-                    order = 'desc';
-                    key = key.slice(0, -5);
-                }
-                if (key.startsWith('roadmap')) {
-                    const [_, roadmapId] = key.split('-');
-                    aValue = a.completion_rate[roadmapId] || 0;
-                    bValue = b.completion_rate[roadmapId] || 0;
-                } else {
-                    aValue = a[key];
-                    bValue = b[key];
-                }
-
-                if (aValue < bValue) return order === 'asc' ? -1 : 1;
-                if (aValue > bValue) return order === 'asc' ? 1 : -1;
-            }
-            return 0;
-        };
-    }
-
-    // Sorting functionality
-    function sortStudents(data) {
-        const sortCriteria = Array.from(document.querySelectorAll(".sort-criteria")).map(select => select.value);
-        const sortedStudents = [...data].sort(dynamicSort(sortCriteria));
-        return sortedStudents;
-    }
-
-    // Add sorting criteria
-    function addSortCriteria() {
+      // Sorting Criteria Functions
+      function addSortCriteria() {
         const container = document.getElementById("sort-criteria-container");
         const div = document.createElement("div");
         div.className = "sort-criteria-item";
         div.innerHTML = `
-            <select class="sort-criteria">
-                <option value="name-asc">Name (Ascending)</option>
-                <option value="name-desc">Name (Descending)</option>
-                <option value="email-asc">Email (Ascending)</option>
-                <option value="email-desc">Email (Descending)</option>
-                <option value="cgpa-asc">CGPA (Ascending)</option>
-                <option value="cgpa-desc">CGPA (Descending)</option>
-                ${roadmaps.map(roadmap => `
-                    <option value="roadmap-${roadmap.roadmap_id}-asc">${roadmap.title} Completion Rate (Ascending)</option>
-                    <option value="roadmap-${roadmap.roadmap_id}-desc">${roadmap.title} Completion Rate (Descending)</option>
-                `).join('')}
-            </select>
-            <button type="button" onclick="removeSortCriteria(this)">Remove</button>
-        `;
+                <select class="sort-criteria">
+                    <option value="name-asc">Name (Ascending)</option>
+                    <option value="name-desc">Name (Descending)</option>
+                    <option value="cgpa-asc">CGPA (Ascending)</option>
+                    <option value="cgpa-desc">CGPA (Descending)</option>
+                    <option value="gvishwanthan-asc">GVishwanthan (Ascending)</option>
+                    <option value="gvishwanthan-desc">GVishwanthan (Descending)</option>
+                    <option value="dsa-asc">DSA Completion (Ascending)</option>
+                    <option value="dsa-desc">DSA Completion (Descending)</option>
+                    <option value="cloud-asc">Cloud Computing (Ascending)</option>
+                    <option value="cloud-desc">Cloud Computing (Descending)</option>
+                </select>
+                <button type="button" onclick="removeSortCriteria(this)">Remove</button>
+            `;
         container.appendChild(div);
-    }
+      }
 
-    // Remove sorting criteria
-    function removeSortCriteria(button) {
+      function removeSortCriteria(button) {
         button.parentElement.remove();
-    }
+      }
 
-    // Apply column filters
-    function applyColumnFilters() {
-        const columns = document.querySelectorAll("th, td");
-        columns.forEach(column => {
-            const columnClass = column.className;
-            const checkbox = document.getElementById(`filter-${columnClass.split('-')[1]}`);
-            if (checkbox && !checkbox.checked) {
-                column.style.display = "none";
-            } else {
-                column.style.display = "";
+      function dynamicSort(criteria) {
+        return function (a, b) {
+          for (let criterion of criteria) {
+            let order = "asc";
+            let key = criterion;
+
+            if (criterion.endsWith("-desc")) {
+              order = "desc";
+              key = criterion.slice(0, -5);
+            } else if (criterion.endsWith("-asc")) {
+              key = criterion.slice(0, -4);
             }
+
+            const aValue = a[key];
+            const bValue = b[key];
+
+            if (aValue < bValue) return order === "asc" ? -1 : 1;
+            if (aValue > bValue) return order === "asc" ? 1 : -1;
+          }
+          return 0;
+        };
+      }
+
+      function sortAndDisplayStudents() {
+        const sortCriteria = Array.from(
+          document.querySelectorAll(".sort-criteria")
+        ).map((select) => select.value);
+        const sortedStudents = [...students].sort(dynamicSort(sortCriteria));
+        displayStudents(sortedStudents);
+      }
+
+      function displayStudents(data) {
+        const tableBody = document.querySelector("#students-table tbody");
+        tableBody.innerHTML = "";
+
+        data.forEach((student) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.email}</td>
+                    <td>${student.cgpa}</td>
+                    <td>${student.gvishwanthan}%</td>
+                    <td>${student.dsa}%</td>
+                    <td>${student.cloud}%</td>
+                `;
+          tableBody.appendChild(row);
         });
-    }
 
-    // Filter top candidates
-    function filterTopCandidates() {
-        const topNumber = parseInt(document.getElementById("top-candidates-number").value);
-        if (isNaN(topNumber) || topNumber <= 0) {
-            alert("Please enter a valid number of top candidates.");
-            return;
+        updateChart(data);
+        applyColumnFilters();
+      }
+
+      function updateChart(data) {
+        performanceChart.data.labels = data.map((student) => student.name);
+        performanceChart.data.datasets[0].data = data.map(
+          (student) => student.gvishwanthan
+        );
+        performanceChart.data.datasets[1].data = data.map(
+          (student) => student.dsa
+        );
+        performanceChart.data.datasets[2].data = data.map(
+          (student) => student.cloud
+        );
+        performanceChart.update();
+      }
+
+      function applyColumnFilters() {
+    const table = document.getElementById('students-table');
+    const headers = table.querySelectorAll('thead th');
+    const rows = table.querySelectorAll('tbody tr');
+
+    headers.forEach((header, index) => {
+        const columnClass = header.textContent.toLowerCase().replace(/\s+/g, '');
+        const checkbox = document.getElementById(`filter-${columnClass}`);
+        
+        if (checkbox && !checkbox.checked) {
+            // Hide header column
+            header.style.display = 'none';
+            
+            // Hide corresponding data columns in all rows
+            rows.forEach(row => {
+                row.cells[index].style.display = 'none';
+            });
+        } else {
+            // Show header column
+            header.style.display = '';
+            
+            // Show corresponding data columns in all rows
+            rows.forEach(row => {
+                row.cells[index].style.display = '';
+            });
         }
-        const sortedStudents = sortStudents(students);
-        const topStudents = sortedStudents.slice(0, topNumber);
-        displayStudents(topStudents);
-    }
+    });
+}
 
-    // Export data to CSV
-    function exportToCSV() {
+      function filterTopCandidates() {
+        const topNumber = parseInt(
+          document.getElementById("top-candidates-number").value
+        );
+        if (isNaN(topNumber) || topNumber <= 0) {
+          alert("Please enter a valid number of top candidates.");
+          return;
+        }
+        const sortedStudents = [...students]
+          .sort(dynamicSort(["cgpa-desc"]))
+          .slice(0, topNumber);
+        displayStudents(sortedStudents);
+      }
+
+      function exportToCSV() {
         const rows = [
-            ["Name", "Email", "CGPA", ...roadmaps.map(roadmap => roadmap.title + " Completion Rate")]
+          ["Name", "Email", "CGPA", "GVishwanthan", "DSA", "Cloud Computing"],
         ];
 
         const tableRows = document.querySelectorAll("#students-table tbody tr");
-        tableRows.forEach(row => {
-            const cells = row.querySelectorAll("td");
-            const rowData = Array.from(cells).map(cell => cell.textContent);
-            rows.push(rowData);
+        tableRows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+          const rowData = Array.from(cells).map((cell) => cell.textContent);
+          rows.push(rowData);
         });
 
-        let csvContent = "data:text/csv;charset=utf-8," 
-            + rows.map(e => e.join(",")).join("\n");
+        let csvContent =
+          "data:text/csv;charset=utf-8," +
+          rows.map((e) => e.join(",")).join("\n");
 
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
@@ -304,19 +497,23 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    }
+      }
 
-    // Combine sorting and filtering functionality
-    document.getElementById("apply-button").addEventListener("click", () => {
-        const sortedStudents = sortStudents(students);
-        displayStudents(sortedStudents);
-        applyColumnFilters();
-    });
+      // Event Listeners
+      document
+        .getElementById("apply-button")
+        .addEventListener("click", sortAndDisplayStudents);
+      document
+        .getElementById("filter-top-button")
+        .addEventListener("click", filterTopCandidates);
+      document
+        .getElementById("export-csv-button")
+        .addEventListener("click", exportToCSV);
 
-    document.getElementById("filter-top-button").addEventListener("click", filterTopCandidates);
-    document.getElementById("export-csv-button").addEventListener("click", exportToCSV);
+      // Initial Display
+      displayStudents(students);
+    </script>
+  </body>
+</html>
 
-    // Initial display (no sorting or filtering applied)
-    displayStudents(students);
-</script>
 {% endblock %}

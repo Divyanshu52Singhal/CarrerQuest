@@ -1,50 +1,48 @@
-{% extends "base.html" %}
-
-{% block title %}Admin Login{% endblock %}
-
-{% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_login.css') }}">
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Admin Login{% endblock %} {% block
+styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/admin_login.css') }}"
+/>
+{% endblock %} {% block content %}
 <div class="admin-login-container">
-    <div class="admin-login-card">
-        <div class="admin-login-header">
-            <h1>Admin Login</h1>
-            <p>Access the administrator dashboard</p>
-        </div>
-        
-        <form method="POST">
-            <div class="admin-form-group">
-                <label for="email">Email</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    required 
-                    placeholder="Enter your admin email"
-                    autocomplete="email">
-            </div>
-            
-            <div class="admin-form-group">
-                <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required 
-                    placeholder="Enter your password"
-                    autocomplete="current-password">
-            </div>
-            
-            <button type="submit" class="admin-submit-btn">
-                Sign In as Admin
-            </button>
-            
-            {% if error %}
-                <div class="admin-error-message">{{ error }}</div>
-            {% endif %}
-        </form>
+  <div class="admin-login-card">
+    <div class="admin-login-header">
+      <h1>Admin Login</h1>
+      <p>Access the administrator dashboard</p>
     </div>
+
+    <form method="POST">
+      <div class="admin-form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          placeholder="Enter your admin email"
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="admin-form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          required
+          placeholder="Enter your password"
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button type="submit" class="admin-submit-btn">Sign In as Admin</button>
+
+      {% if error %}
+      <div class="admin-error-message">{{ error }}</div>
+      {% endif %}
+    </form>
+  </div>
 </div>
 {% endblock %}
