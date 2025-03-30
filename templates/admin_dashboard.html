@@ -4,6 +4,7 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
@@ -134,6 +135,10 @@
 </div>
 </div>
 
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{% endblock %}
 <script>
     function toggleVisibility(id) {
         const element = document.getElementById(id);
@@ -156,7 +161,11 @@
         data.forEach(student => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td class="column-name">${student.name}</td>
+                <td class="column-name">
+                <a href="/student/profile/${student.email}" class="student-link">
+                    ${student.name}
+                </a>
+            </td>
                 <td class="column-email">${student.email}</td>
                 <td class="column-cgpa">${student.cgpa}</td>
                 ${roadmaps.map(roadmap => {
@@ -212,23 +221,46 @@
         const div = document.createElement("div");
         div.className = "sort-criteria-item";
         div.innerHTML = `
-            <select class="sort-criteria">
+        <select class="sort-criteria" onchange="handleSortChange(this)">
+            <option value="">Search or select an option...</option>
+            <optgroup label="Name">
                 <option value="name-asc">Name (Ascending)</option>
                 <option value="name-desc">Name (Descending)</option>
-                <option value="email-asc">Email (Ascending)</option>
-                <option value="email-desc">Email (Descending)</option>
+            </optgroup>
+            <optgroup label="CGPA">
                 <option value="cgpa-asc">CGPA (Ascending)</option>
                 <option value="cgpa-desc">CGPA (Descending)</option>
+            </optgroup>
+            <optgroup label="Roadmap Completion Rates">
                 ${roadmaps.map(roadmap => `
                     <option value="roadmap-${roadmap.roadmap_id}-asc">${roadmap.title} Completion Rate (Ascending)</option>
                     <option value="roadmap-${roadmap.roadmap_id}-desc">${roadmap.title} Completion Rate (Descending)</option>
                 `).join('')}
-            </select>
-            <button type="button" onclick="removeSortCriteria(this)">Remove</button>
-        `;
-        container.appendChild(div);
+            </optgroup>
+        </select>
+        <button type="button" onclick="removeSortCriteria(this)" class="remove-criteria-btn">✕</button>
+    `;
+    container.appendChild(div);
+    
+    // Initialize select2 on the new select element
+    $(div.querySelector('.sort-criteria')).select2({
+        width: '100%',
+        placeholder: 'Search or select an option...',
+        allowClear: true,
+        theme: 'classic'
+        });
     }
-
+    $(document).ready(function() {
+    // Initialize any existing sort criteria selects
+    $('.sort-criteria').each(function() {
+        $(this).select2({
+            width: '100%',
+            placeholder: 'Search or select an option...',
+            allowClear: true,
+            theme: 'classic'
+        });
+    });
+});
     // Remove sorting criteria
     function removeSortCriteria(button) {
         button.parentElement.remove();

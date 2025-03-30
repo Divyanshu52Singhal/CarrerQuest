@@ -14,7 +14,9 @@
   </head>
   <body>
     <nav class="navbar">
-      <div class="logo">LOGOME</div>
+      <div class="logo">
+        <img src="{{ url_for('static', filename='img/LOGO.png') }}" alt="LOGOME" class="logo-img">
+      </div>
       <div class="hamburger">
         <span></span>
         <span></span>
@@ -23,6 +25,7 @@
       <div class="nav-links">
         {% if session.get('user') %}
         <a href="{{ url_for('student_dashboard') }}">Student Dashboard</a>
+        <a href="{{ url_for('view_profile') }}">My Progress</a>
         <a href="{{ url_for('logout') }}">Logout</a>
         {% elif session.get('admin') %}
         <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>

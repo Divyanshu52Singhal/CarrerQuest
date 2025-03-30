@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+{% block content %}
+<div class="profile-container">
+    <!-- Personal Information Section -->
+    <div class="section">
+        <h2>Personal Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Name:</label>
+                <span>{{ student.name }}</span>
+            </div>
+            <div class="info-item">
+                <label>Email:</label>
+                <span>{{ student.email }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roadmaps Section -->
+    <div class="section">
+        <h2>My Roadmaps</h2>
+        {% if student.roadmaps %}
+            {% for roadmap_data in student.roadmaps %}
+            <div class="roadmap-card">
+                <h3>{{ roadmap_data.roadmap.title }}</h3>
+                
+                {% if roadmap_data.courses %}
+                    {% for course in roadmap_data.courses %}
+                    <div class="course-card">
+                        <div class="course-header">
+                            <h4>{{ course.name }}</h4>
+                            <div class="progress-info">
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: {{ course.progress_percentage }}%"></div>
+                                </div>
+                                <span>{{ "%.1f"|format(course.progress_percentage) }}%</span>
+                            </div>
+                        </div>
+
+                        <div class="chapters-list">
+                            {% for chapter in course.chapters %}
+                            <div class="chapter-item">
+                                <div class="chapter-info">
+                                    <span class="chapter-title">{{ chapter.title }}</span>
+                                    {% if chapter.quiz_result %}
+                                    <div class="quiz-result {% if chapter.quiz_result.passed %}passed{% else %}failed{% endif %}">
+                                        Quiz: {{ "%.1f"|format(chapter.quiz_result.percentage) }}%
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="chapter-status">
+                                    {% if chapter.completed %}
+                                    <span class="status-badge completed">Completed</span>
+                                    {% else %}
+                                    <span class="status-badge pending">Pending</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-courses">No courses available in this roadmap.</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-roadmaps">You haven't subscribed to any roadmaps yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

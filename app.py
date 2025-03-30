@@ -47,6 +47,8 @@ def convert_objectid_to_str(data):
 # Home route
 @app.route("/")
 def landing():
+    if "user" in session or "admin" in session:
+        return redirect(url_for("student_dashboard") if "user" in session else "admin_dashboard")
     return render_template("landing.html")
 
 # Admin Login
@@ -663,7 +665,165 @@ def update_chapter_status():
     # Send response back
     status_message = f"Chapter '{chapter_title}' marked as {'Complete' if completed else 'Incomplete'}."
     return redirect(url_for("view_roadmap", roadmap_id=roadmap_id, message=status_message))
+@app.route("/student/profile", methods=["GET"])
+def view_profile():
+    if "user" not in session:
+        return redirect(url_for("student_login"))
+    
+    user_email = session["user"]
+    student = mongo.db.students.find_one({"email": user_email})
+    
+    if not student:
+        return redirect(url_for("student_login"))
 
+    # Get subscribed roadmaps details
+    roadmaps_data = []
+    subscribed_roadmaps = student.get("subscribed_roadmaps", [])
+    student_progress = student.get("progress", {})
+    student_quiz_results = student.get("quiz_results", {})
+    
+    for roadmap_id in subscribed_roadmaps:
+        roadmap = mongo.db.roadmaps.find_one({"roadmap_id": roadmap_id})
+        if roadmap:
+            roadmap_progress = student_progress.get(roadmap_id, {})
+            roadmap_quiz_results = student_quiz_results.get(roadmap_id, {})
+            
+            # Get courses for this roadmap
+            courses_data = []
+            for course_id in roadmap.get("course_ids", []):
+                course = mongo.db.courses.find_one({"course_id": course_id})
+                if course:
+                    # Get chapter completion status
+                    course_progress = roadmap_progress.get(course_id, {})
+                    course_quiz_results = roadmap_quiz_results.get(course_id, {})
+                    
+                    # Process chapters with completion status
+                    processed_chapters = []
+                    total_completed = 0
+                    for chapter in course.get("chapters", []):
+                        chapter_data = {
+                            "title": chapter["title"],
+                            "completed": course_progress.get(chapter["title"], False),
+                            "quiz_result": course_quiz_results.get(chapter["title"], None)
+                        }
+                        if chapter_data["completed"]:
+                            total_completed += 1
+                        processed_chapters.append(chapter_data)
+                    
+                    # Calculate course progress percentage
+                    total_chapters = len(course.get("chapters", []))
+                    progress_percentage = (total_completed / total_chapters * 100) if total_chapters > 0 else 0
+                    
+                    # Add processed course data
+                    courses_data.append({
+                        "course_id": course_id,
+                        "name": course.get("name"),
+                        "chapters": processed_chapters,
+                        "progress_percentage": progress_percentage
+                    })
+            
+            roadmaps_data.append({
+                "roadmap": {
+                    "roadmap_id": roadmap_id,
+                    "title": roadmap.get("title")
+                },
+                "courses": courses_data
+            })
+
+    # Prepare profile data
+    profile_data = {
+        "name": student.get("name", ""),
+        "email": student.get("email", ""),
+        "registration_date": student.get("registration_date", ""),
+        "roadmaps": roadmaps_data
+    }
+        
+    return render_template("student_profile.html", student=profile_data)
+@app.route("/student/profile/<email>")
+def admin_view_student_profile(email):
+    if "admin" not in session:
+        return jsonify({"error": "Unauthorized"}), 401    
+        
+    student = mongo.db.students.find_one({"email": email})
+    if not student:
+        return redirect(url_for("admin_dashboard"))
+    roadmaps_data = []
+    subscribed_roadmaps = student.get("subscribed_roadmaps", [])
+    student_progress = student.get("progress", {})
+    student_quiz_results = student.get("quiz_results", {})
+    
+    for roadmap_id in subscribed_roadmaps:
+        roadmap = mongo.db.roadmaps.find_one({"roadmap_id": roadmap_id})
+        if roadmap:
+            roadmap_progress = student_progress.get(roadmap_id, {})
+            roadmap_quiz_results = student_quiz_results.get(roadmap_id, {})
+            
+            # Get courses for this roadmap
+            courses_data = []
+            for course_id in roadmap.get("course_ids", []):
+                course = mongo.db.courses.find_one({"course_id": course_id})
+                if course:
+                    # Get chapter completion status
+                    course_progress = roadmap_progress.get(course_id, {})
+                    course_quiz_results = roadmap_quiz_results.get(course_id, {})
+                    
+                    # Process chapters with completion status
+                    processed_chapters = []
+                    total_completed = 0
+                    for chapter in course.get("chapters", []):
+                        chapter_data = {
+                            "title": chapter["title"],
+                            "completed": course_progress.get(chapter["title"], False),
+                            "quiz_result": course_quiz_results.get(chapter["title"], None)
+                        }
+                        if chapter_data["completed"]:
+                            total_completed += 1
+                        processed_chapters.append(chapter_data)
+                    
+                    # Calculate course progress percentage
+                    total_chapters = len(course.get("chapters", []))
+                    progress_percentage = (total_completed / total_chapters * 100) if total_chapters > 0 else 0
+                    
+                    # Add processed course data
+                    courses_data.append({
+                        "course_id": course_id,
+                        "name": course.get("name"),
+                        "chapters": processed_chapters,
+                        "progress_percentage": progress_percentage
+                    })
+            
+            roadmaps_data.append({
+                "roadmap": {
+                    "roadmap_id": roadmap_id,
+                    "title": roadmap.get("title")
+                },
+                "courses": courses_data
+            })
+
+    # Prepare profile data
+    profile_data = {
+        "name": student.get("name", ""),
+        "email": student.get("email", ""),
+        "registration_date": student.get("registration_date", ""),
+        "roadmaps": roadmaps_data
+    }    
+    # Use the same logic as student profile view
+    # but with admin privileges
+    return render_template("student_profile.html", 
+                         student=profile_data, 
+                         is_admin_view=True)
+def calculate_overall_progress(student):
+    """Calculate overall progress across all roadmaps"""
+    total_chapters = 0
+    completed_chapters = 0
+    
+    for roadmap_id in student.get("subscribed_roadmaps", []):
+        progress = student.get("progress", {}).get(roadmap_id, {})
+        for course_progress in progress.values():
+            completed_chapters += sum(1 for completed in course_progress.values() if completed)
+            total_chapters += len(course_progress)
+    
+    return (completed_chapters / total_chapters * 100) if total_chapters > 0 else 0
 @app.route("/student/signup", methods=["GET", "POST"])
 def student_signup():
     if request.method == "POST":

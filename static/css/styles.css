@@ -3,10 +3,27 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 5%;
+    padding: 1rem 4rem;
+    background-color: var(--white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background: transparent;
     position: relative;
     z-index: 1000;
+}
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--primary-color);
 }
 
 .logo {
@@ -14,7 +31,17 @@
     font-weight: bold;
     color: #312E81;
 }
+.logo-img {
+    height: 60px;  /* Adjust this value based on your navbar height */
+    width: auto;
+    object-fit: contain;
+}
 
+@media (max-width: 768px) {
+    .logo-img {
+        height: 32px;  /* Slightly smaller on mobile */
+    }
+}
 .hamburger {
     display: none;
     flex-direction: column;

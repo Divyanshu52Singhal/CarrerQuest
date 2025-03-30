@@ -24,7 +24,6 @@
                             <th>Chapter</th>
                             <th>Score</th>
                             <th>Status</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,11 +33,6 @@
                             <td>{{ result.score }}/{{ result.total_questions }} ({{ result.percentage|round(1) }}%)</td>
                             <td class="status {% if result.passed %}passed{% else %}failed{% endif %}">
                                 {{ "Passed" if result.passed else "Failed" }}
-                            </td>
-                            <td>
-                                <a href="{{ url_for('take_chapter_quiz', roadmap_id=roadmap_id, course_id=course_id, chapter_title=chapter_title) }}" class="btn small">
-                                    {{ "Review" if result.passed else "Retry" }}
-                                </a>
                             </td>
                         </tr>
                         {% endfor %}
