@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/preview.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.3/katex.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.15.3/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/latex.js/dist/latex.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="preview-container">
+    <div class="preview-header">
+        <h1>Resume Preview</h1>
+        <div class="preview-actions">
+            <button onclick="window.print()" class="btn btn-primary">Print</button>
+            <button onclick="downloadPDF()" class="btn btn-success">Download PDF</button>
+            <a href="{{ url_for('resume_form') }}" class="btn btn-secondary">Back to Editor</a>
+        </div>
+    </div>
+    
+    <div class="preview-content" id="preview-content">
+        <div id="latex-render"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const latexContent = `{{ latex_content|safe }}`;
+    
+    // Initialize LaTeX.js generator
+    const generator = new latexjs.HtmlGenerator({ hyphenate: false });
+    
+    try {
+        // Convert LaTeX to HTML
+        const html = generator.process(latexContent);
+        document.getElementById('latex-render').appendChild(html);
+    } catch (error) {
+        console.error('LaTeX rendering error:', error);
+        document.getElementById('latex-render').innerHTML = 
+            '<div class="error">Error rendering LaTeX content. Please check the format.</div>';
+    }
+});
+
+async function downloadPDF() {
+    try {
+        const response = await fetch('/generate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({{ latex_content|tojson|safe }})
+        });
+        
+        if (!response.ok) throw new Error('PDF generation failed');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'resume.pdf';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error generating PDF. Please try again.');
+    }
+}
+</script>
+{% endblock %}
