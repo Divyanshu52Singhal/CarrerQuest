@@ -181,8 +181,8 @@
                 <td class="column-email">${student.email}</td>
                 <td class="column-cgpa">${student.cgpa}</td>
                 ${roadmaps.map(roadmap => {
-                    const completionRate = student.completion_rate[roadmap.roadmap_id] || 0;
-                    return <td class="column-${roadmap.roadmap_id}">${completionRate}%</td>;
+                    const completionRate = Math.round(student.completion_rate[roadmap.roadmap_id]) || 0;
+                    return `<td class="column-${roadmap.roadmap_id}">${completionRate}%</td>`;
                 }).join('')}
             `;
             tableBody.appendChild(row);
