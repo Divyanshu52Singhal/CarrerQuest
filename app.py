@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from collections import defaultdict
+from datetime import datetime, timedelta
+from functools import wraps
 from flask_pymongo import PyMongo
 from flask_bcrypt import Bcrypt
 from dotenv import load_dotenv
@@ -12,9 +14,26 @@ load_dotenv(dotenv_path="process.env")
 app = Flask(__name__)
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.config["SECRET_KEY"] = "password"
+SESSION_TIMEOUT = timedelta(minutes=10)
 
 mongo = PyMongo(app)
 bcrypt = Bcrypt(app)
+
+
+def check_session_timeout(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'last_activity' in session:
+            last_activity = datetime.fromisoformat(session['last_activity'])
+            if datetime.now() - last_activity > SESSION_TIMEOUT:
+                # Clear session if timeout exceeded
+                session.clear()
+                return redirect(url_for('landing'))
+        
+        # Update last activity time
+        session['last_activity'] = datetime.now().isoformat()
+        return f(*args, **kwargs)
+    return decorated_function
 
 def convert_objectid_to_str(data):
     if isinstance(data, list):
@@ -39,6 +58,7 @@ def admin_login():
         admin = mongo.db.admins.find_one({"email": email})
         if admin and bcrypt.check_password_hash(admin["password"], password):
             session["admin"] = email
+            session['last_activity'] = datetime.now().isoformat()
             return redirect(url_for("admin_dashboard"))
         return render_template("admin_login.html", error="Invalid Admin credentials")
     return render_template("admin_login.html")
@@ -52,13 +72,17 @@ def student_login():
         user = mongo.db.students.find_one({"email": email})
         if user and bcrypt.check_password_hash(user["password"], password):
             session["user"] = email
+            session['last_activity'] = datetime.now().isoformat()
             return redirect(url_for("student_dashboard"))
         return render_template("student_login.html", error="Invalid Student credentials")
     return render_template("student_login.html")
 
 # Admin Dashboard
 @app.route("/admin/dashboard")
+@check_session_timeout
 def admin_dashboard():
+    if "admin" not in session:
+        return redirect(url_for("admin_login"))
     roadmaps = list(mongo.db.roadmaps.find())
     for roadmap in roadmaps:
         course_ids = roadmap.get("course_ids", [])
@@ -344,6 +368,7 @@ def take_chapter_quiz(roadmap_id, course_id, chapter_title):
         return redirect(url_for("student_login"))
     
     user_email = session["user"]
+    # print(session)
     student = mongo.db.students.find_one({"email": user_email})
     
     # Check if student is subscribed to this roadmap
@@ -409,6 +434,7 @@ def take_chapter_quiz(roadmap_id, course_id, chapter_title):
             )
             
         return render_template("quiz_results.html", 
+                              current_user=user_email,
                               quiz=quiz, 
                               score=score, 
                               total=total_questions, 
@@ -419,7 +445,7 @@ def take_chapter_quiz(roadmap_id, course_id, chapter_title):
                               time_limit_seconds=total_seconds,
                               roadmap_id=roadmap_id)
     
-    return render_template("take_quiz.html", quiz=quiz, roadmap_id=roadmap_id, course_id=course_id, chapter_title=chapter_title)
+    return render_template("take_quiz.html", current_user=user_email,quiz=quiz, roadmap_id=roadmap_id, course_id=course_id, chapter_title=chapter_title)
 
 # Create Quiz (Admin)
 @app.route("/admin/create_quiz/<roadmap_id>/<course_id>/<chapter_title>", methods=["GET", "POST"])
@@ -523,6 +549,7 @@ def student_quiz_results():
                           roadmap_details=roadmap_details)
 # Student Dashboard
 @app.route("/student/dashboard")
+@check_session_timeout
 def student_dashboard():
     if "user" not in session:
         return redirect(url_for("student_login"))

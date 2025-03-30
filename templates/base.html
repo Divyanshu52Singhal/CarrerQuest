@@ -46,6 +46,32 @@
           this.classList.toggle("active");
           document.querySelector(".nav-links").classList.toggle("active");
         });
+        // Check session timeout every minute
+    setInterval(function() {
+        const lastActivity = localStorage.getItem('lastActivity');
+        if (lastActivity) {
+            const inactiveTime = Date.now() - parseInt(lastActivity);
+            // If inactive for 15 minutes (900000 milliseconds)
+            if (inactiveTime > 900000) {
+                // Clear local storage
+                localStorage.clear();
+                // Redirect to landing page
+                window.location.href = "{{ url_for('landing') }}";
+            }
+        }
+    }, 60000); // Check every minute
+
+    // Update last activity timestamp on any user interaction
+    document.addEventListener('mousemove', updateLastActivity);
+    document.addEventListener('keypress', updateLastActivity);
+    document.addEventListener('click', updateLastActivity);
+
+    function updateLastActivity() {
+        localStorage.setItem('lastActivity', Date.now().toString());
+    }
+
+    // Set initial last activity
+    updateLastActivity();
     </script>
 
     

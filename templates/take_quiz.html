@@ -1,4 +1,4 @@
-<!-- take_quiz.html -->
+<!-- take_quiz.html (fixed radio buttons) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,10 +45,11 @@
             <div class="question-card">
                 <h3>Question {{ loop.index }}: {{ question.question_text }}</h3>
                 
+                {% set question_index = loop.index0 %}
                 {% for option in question.options %}
                 <div class="option">
-                    <input type="radio" id="q{{ loop.index0 }}_{{ loop.index0 }}" name="answer_{{ loop.index0 }}" value="{{ option }}" required>
-                    <label for="q{{ loop.index0 }}_{{ loop.index0 }}">{{ option }}</label>
+                    <input type="radio" id="q{{ question_index }}_option{{ loop.index0 }}" name="answer_{{ question_index }}" value="{{ option }}">
+                    <label for="q{{ question_index }}_option{{ loop.index0 }}">{{ option }}</label>
                 </div>
                 {% endfor %}
             </div>
@@ -63,11 +64,18 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Quiz ID to make storage unique per quiz
+            // Get user and quiz specific identifiers
+            const userId = "{{ current_user.id }}";
             const quizId = "{{ quiz.quiz_id }}";
-            const quizStartKey = `quiz_${quizId}_start_time`;
-            const quizDurationKey = `quiz_${quizId}_duration`;
-            
+            const quizStartKey = `quiz_${userId}_${quizId}_start`;
+            const quizDurationKey = `quiz_${userId}_${quizId}_duration`;
+            const quizResponsesKey = `quiz_${userId}_${quizId}_responses`;
+    
+            // Clear any existing quiz data for this quiz
+            localStorage.removeItem(quizStartKey);
+            localStorage.removeItem(quizDurationKey);
+            localStorage.removeItem(quizResponsesKey);
+    
             // Parse time limit from server (format: MM:SS)
             const timerElement = document.getElementById('timer');
             const initialTime = timerElement.textContent.trim();
@@ -75,79 +83,51 @@
             
             // Calculate total seconds for this quiz
             const quizTotalSeconds = minutes * 60 + seconds;
-            
-            // Check if quiz has already started
-            let startTime = localStorage.getItem(quizStartKey);
-            let currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
-            let elapsedSeconds = 0;
             let remainingSeconds = quizTotalSeconds;
             
-            // If quiz already started, calculate remaining time
-            if (startTime) {
-                startTime = parseInt(startTime);
-                elapsedSeconds = currentTime - startTime;
-                remainingSeconds = quizTotalSeconds - elapsedSeconds;
-                
-                // If time is already up, submit immediately
-                if (remainingSeconds <= 0) {
-                    document.getElementById('timerExpired').value = 'true';
-                    document.getElementById('timeTaken').value = quizTotalSeconds;
-                    document.getElementById('quizForm').submit();
-                    return;
-                }
-            } else {
-                // First time starting the quiz
-                startTime = currentTime;
-                localStorage.setItem(quizStartKey, startTime.toString());
-                localStorage.setItem(quizDurationKey, quizTotalSeconds.toString());
-            }
+            // Initialize start time
+            const startTime = Math.floor(Date.now() / 1000);
+            localStorage.setItem(quizStartKey, startTime.toString());
+            localStorage.setItem(quizDurationKey, quizTotalSeconds.toString());
             
             // Update timer display immediately
-            minutes = Math.floor(remainingSeconds / 60);
-            seconds = remainingSeconds % 60;
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            // Change color to red when less than 1 minute remains
-            if (remainingSeconds < 60) {
-                timerElement.style.color = '#ff0000';
-            }
+            updateTimerDisplay();
             
             // Setup timer interval
             const timer = setInterval(function() {
                 remainingSeconds--;
-                
-                // Save responses to localStorage periodically to restore them on refresh
+                updateTimerDisplay();
                 saveResponses();
                 
                 if (remainingSeconds <= 0) {
-                    clearInterval(timer);
-                    // Set flag for server to know timer expired
-                    document.getElementById('timerExpired').value = 'true';
-                    document.getElementById('timeTaken').value = quizTotalSeconds;
-                    
-                    // Remove localStorage data before submitting
-                    localStorage.removeItem(quizStartKey);
-                    localStorage.removeItem(quizDurationKey);
-                    clearSavedResponses();
-                    
-                    // Auto-submit the form
-                    document.getElementById('quizForm').submit();
+                    handleTimeUp();
                 }
+            }, 1000);
+    
+            function updateTimerDisplay() {
+                const mins = Math.floor(remainingSeconds / 60);
+                const secs = remainingSeconds % 60;
+                timerElement.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                 
-                // Update timer display
-                minutes = Math.floor(remainingSeconds / 60);
-                seconds = remainingSeconds % 60;
-                
-                // Format display with leading zeros
-                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
-                // Change color to red when less than 1 minute remains
                 if (remainingSeconds < 60) {
                     timerElement.style.color = '#ff0000';
                 }
-            }, 1000);
-            
-            // Save quiz responses to localStorage
+            }
+    
+            function handleTimeUp() {
+                clearInterval(timer);
+                document.getElementById('timerExpired').value = 'true';
+                document.getElementById('timeTaken').value = quizTotalSeconds;
+                clearLocalStorage();
+                document.getElementById('quizForm').submit();
+            }
+    
+            function clearLocalStorage() {
+                localStorage.removeItem(quizStartKey);
+                localStorage.removeItem(quizDurationKey);
+                localStorage.removeItem(quizResponsesKey);
+            }
+    
             function saveResponses() {
                 const form = document.getElementById('quizForm');
                 const radioButtons = form.querySelectorAll('input[type="radio"]:checked');
@@ -157,43 +137,44 @@
                     responses[radio.name] = radio.value;
                 });
                 
-                localStorage.setItem(`quiz_${quizId}_responses`, JSON.stringify(responses));
+                localStorage.setItem(quizResponsesKey, JSON.stringify(responses));
             }
-            
-            // Restore responses from localStorage if page is refreshed
+    
             function restoreResponses() {
-                const savedResponses = localStorage.getItem(`quiz_${quizId}_responses`);
+                const savedResponses = localStorage.getItem(quizResponsesKey);
                 if (savedResponses) {
                     const responses = JSON.parse(savedResponses);
-                    
-                    for (const [name, value] of Object.entries(responses)) {
-                        const radioButtons = document.querySelectorAll(`input[name="${name}"]`);
-                        radioButtons.forEach(radio => {
-                            if (radio.value === value) {
-                                radio.checked = true;
-                            }
-                        });
-                    }
+                    Object.entries(responses).forEach(([name, value]) => {
+                        const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+                        if (radio) {
+                            radio.checked = true;
+                        }
+                    });
                 }
             }
-            
-            // Clear saved responses
-            function clearSavedResponses() {
-                localStorage.removeItem(`quiz_${quizId}_responses`);
-            }
-            
-            // Add event listener for form submission
-            document.getElementById('quizForm').addEventListener('submit', function() {
-                // Calculate time taken in seconds
-                document.getElementById('timeTaken').value = quizTotalSeconds - remainingSeconds;
-                
-                // Clean up localStorage
-                localStorage.removeItem(quizStartKey);
-                localStorage.removeItem(quizDurationKey);
-                clearSavedResponses();
+    
+            // Handle form submission
+            document.getElementById('quizForm').addEventListener('submit', function(e) {
+                const timeTaken = quizTotalSeconds - remainingSeconds;
+                document.getElementById('timeTaken').value = timeTaken;
+                clearLocalStorage();
             });
-            
-            // Restore responses if page was refreshed
+    
+            // Handle page visibility change
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    saveResponses();
+                } else {
+                    restoreResponses();
+                }
+            });
+    
+            // Handle before unload
+            window.addEventListener('beforeunload', function(e) {
+                saveResponses();
+            });
+    
+            // Initial restore of responses
             restoreResponses();
         });
     </script>

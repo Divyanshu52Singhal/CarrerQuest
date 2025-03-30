@@ -29,7 +29,7 @@
                                     <input type="text" class="form-control" name="chapters[]" placeholder="Chapter Title" value="{{ chapter['title'] }}" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <input type="text" class="form-control" name="links[]" placeholder="Resource Link" value="{{ chapter['link'] }}" required>
+                                    <input type="text" class="form-control" name="links[]" placeholder="Resource Link" value="{{ chapter['link'] }}">
                                 </div>
                                 <div class="col-md-1">
                                     <button type="button" class="btn btn-danger remove-chapter">✕</button>
@@ -47,11 +47,6 @@
                         <div class="d-flex justify-content-between mt-4">
                             <button type="submit" class="btn btn-primary">Update Course</button>
                             <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
-                            
-                            <!-- Delete button with confirmation modal trigger -->
-                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCourseModal">
-                                Delete Course
-                            </button>
                         </div>
                     </form>
                 </div>
