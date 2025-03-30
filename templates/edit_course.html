@@ -68,7 +68,7 @@
                 <p class="text-danger"><strong>Warning:</strong> This will also delete all quizzes associated with this course and remove it from student progress. This action cannot be undone.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</a>
                 <form action="{{ url_for('admin_delete_course', roadmap_id=roadmap['roadmap_id'], course_id=course['course_id']) }}" method="POST">
                     <button type="submit" class="btn btn-danger">Delete Permanently</button>
                 </form>
