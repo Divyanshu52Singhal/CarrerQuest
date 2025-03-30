@@ -47,7 +47,7 @@
                                 </div>
                                 <ul id="course-{{course.name}}" class="chapter-list collapsible-content" style="display: none;">
                                     {% for chapter in course.chapters %}
-                                        <li class="chapter-item">{{ chapter.title }} - {% if chapter.link %}
+                                        <li class="chapter-item"><div class="chapter-content">{{ chapter.title }} - {% if chapter.link %}
                                             <a href="{% if '://' in chapter.link %}{{ chapter.link }}{% else %}https://{{ chapter.link }}{% endif %}" 
                                                target="_blank" 
                                                rel="noopener noreferrer">
@@ -55,11 +55,12 @@
                                             </a>
                                             
                                         {% endif %}
+                                        </div>
                                         <a href="{{ url_for('create_quiz', roadmap_id=roadmap.roadmap_id, course_id=course.course_id, chapter_title=chapter.title) }}" 
                                         class="btn btn-sm btn-secondary">
                                         Create/Edit Quiz
                                      </a></li>
-                                    {% endfor %}
+                                    {% endfor %}    
                                 </ul>
                             </li>
                         {% endfor %}
