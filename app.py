@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify,send_file
 from collections import defaultdict
 from datetime import datetime, timedelta
 from functools import wraps
@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from bson import ObjectId
 import json
 import os
+from resume_generator import ResumeGenerator
+from io import BytesIO
 
 # Load environment variables
 load_dotenv(dotenv_path="process.env")
@@ -15,7 +17,6 @@ app = Flask(__name__)
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.config["SECRET_KEY"] = "password"
 SESSION_TIMEOUT = timedelta(minutes=10)
-
 mongo = PyMongo(app)
 bcrypt = Bcrypt(app)
 
@@ -812,6 +813,91 @@ def admin_view_student_profile(email):
     return render_template("student_profile.html", 
                          student=profile_data, 
                          is_admin_view=True)
+
+@app.route('/form')
+def resume_form():
+    """Display the resume form page with pre-filled student information."""
+    if "user" not in session:
+        return redirect(url_for("student_login"))
+    
+    user_email = session["user"]
+    student = mongo.db.students.find_one({"email": user_email})
+    
+    if not student:
+        return redirect(url_for("student_login"))
+    
+    # Get student's roadmaps and courses for education section
+    education_data = []
+    projects_data = []
+    skills = {"Languages": [], "Frameworks": [], "Developer Tools": [], "Libraries": []}    
+    form_data = {
+        "personal_info": {
+            "name": student.get("name", ""),
+            "email": student.get("email", ""),
+            "phone": student.get("phone", ""),
+            "linkedin_url": student.get("linkedin_url", ""),
+            "github_url": student.get("github_url", "")
+        },
+        "education": education_data,
+        "projects": projects_data,
+        "skills": skills,
+        "cgpa": student.get("cgpa", "")
+    }
+    
+    return render_template('resume_form.html', form_data=form_data)
+
+@app.route('/generate', methods=['POST'])
+def generate_resume():
+    if not request.is_json:
+        return {"error": "Content-Type must be application/json"}, 400
+    
+    data = request.get_json()
+    
+    # Generate LaTeX content
+    latex_content = ResumeGenerator.from_json(data, "./resume_template.tex")
+    
+    # Create in-memory file
+    mem_file = BytesIO(latex_content.encode('utf-8'))
+    
+    # Return the file
+    return send_file(mem_file,
+                    mimetype='application/x-tex',
+                    as_attachment=True,
+                    download_name='resume.tex')
+
+@app.route('/preview', methods=['POST'])
+def preview_resume():
+    """Endpoint to generate resume preview"""
+    if not request.is_json:
+        return {"error": "Content-Type must be application/json"}, 400
+    
+    data = request.get_json()
+    
+    try:
+        # Generate LaTeX content
+        latex_content = ResumeGenerator.from_json(data, "./resume_template.tex")
+        
+        # Store the preview content in session for the preview page
+        session['preview_content'] = latex_content
+        
+        return jsonify({
+            "success": True,
+            "redirect_url": url_for('show_preview')
+        })
+    except Exception as e:
+        return jsonify({
+            "error": f"Error generating preview: {str(e)}"
+        }), 500
+
+@app.route('/show_preview')
+def show_preview():
+    """Display the resume preview page"""
+    if 'preview_content' not in session:
+        return redirect(url_for('resume_form'))
+        
+    latex_content = session['preview_content']
+    return render_template('preview_resume.html', latex_content=latex_content)
+
 def calculate_overall_progress(student):
     """Calculate overall progress across all roadmaps"""
     total_chapters = 0

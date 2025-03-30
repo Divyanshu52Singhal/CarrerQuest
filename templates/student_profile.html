@@ -25,8 +25,11 @@
         {% if student.roadmaps %}
             {% for roadmap_data in student.roadmaps %}
             <div class="roadmap-card">
-                <h3>{{ roadmap_data.roadmap.title }}</h3>
-                
+                <div class="roadmap-header" onclick="toggleRoadmap(this)">
+                    <h3>{{ roadmap_data.roadmap.title }}</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="roadmap-content">
                 {% if roadmap_data.courses %}
                     {% for course in roadmap_data.courses %}
                     <div class="course-card">
@@ -72,5 +75,37 @@
             <p class="no-roadmaps">You haven't subscribed to any roadmaps yet.</p>
         {% endif %}
     </div>
+    
 </div>
+<script>
+    function toggleRoadmap(header) {
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.toggle-icon');
+        
+        // Toggle active class
+        content.classList.toggle('active');
+        icon.classList.toggle('active');
+        
+        // Save state to localStorage
+        const roadmapId = header.textContent.trim();
+        const isOpen = content.classList.contains('active');
+        localStorage.setItem(`roadmap_${roadmapId}`, isOpen);
+    }
+    
+    // Restore roadmap states on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const roadmapHeaders = document.querySelectorAll('.roadmap-header');
+        roadmapHeaders.forEach(header => {
+            const roadmapId = header.textContent.trim();
+            const wasOpen = localStorage.getItem(`roadmap_${roadmapId}`) === 'true';
+            
+            if (wasOpen) {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('.toggle-icon');
+                content.classList.add('active');
+                icon.classList.add('active');
+            }
+        });
+    });
+    </script>
 {% endblock %}

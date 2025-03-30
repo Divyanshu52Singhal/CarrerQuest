@@ -119,7 +119,32 @@
     background: #ffebee;
     color: #c62828;
 }
+.roadmap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
 
+.roadmap-content {
+    display: none;
+    padding: 15px;
+}
+
+.roadmap-content.active {
+    display: block;
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.toggle-icon.active {
+    transform: rotate(180deg);
+}
 @media (max-width: 768px) {
     .course-header {
         flex-direction: column;
