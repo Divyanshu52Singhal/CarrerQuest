@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Landing Page</title>
+    <title>CareerQuest - Personalized Career Guidance Platform</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/landing.css') }}"
@@ -17,10 +17,11 @@
   <body>
     <div class="hero-section">
       <div class="hero-content">
-        <h1>Why do we use it?</h1>
+        <h1>Navigate Your Career Journey with Confidence</h1>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque
-          facilisis sollicitudin ante.
+          CareerQuest connects students with alumni and PAT officers to create personalized 
+          career roadmaps based on proven success paths, enhancing your placement readiness 
+          from day one of your college journey.
         </p>
         <div class="button-container">
           <a
@@ -33,8 +34,160 @@
           >
         </div>
       </div>
+      <div class="hero-image">
+        <img src="{{ url_for('static', filename='img/Schoolprograming.jpg') }}" alt="heroimage">
+      </div>
       <div class="wave-shape"></div>
     </div>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="section-header">
+        <h2>Key Features</h2>
+        <p>Discover how CareerQuest transforms your career preparation</p>
+      </div>
+      <div class="features-container">
+        <div class="feature-card">
+          <div class="feature-icon code-icon">
+            <i class="fas fa-route"></i>
+          </div>
+          <h3>Personalized Roadmaps</h3>
+          <p>Tailored career paths based on your interests in frontend, backend, UI/UX, ML, or data science</p>
+          <a href="#" class="feature-btn">Explore Paths</a>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon css-icon">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <h3>Alumni Engagement</h3>
+          <p>Connect with successful graduates who share insights from their professional journey</p>
+          <a href="#" class="feature-btn">Meet Alumni</a>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon html-icon">
+            <i class="fas fa-book"></i>
+          </div>
+          <h3>Educational Resources</h3>
+          <p>Access beginner-friendly blogs explaining core technologies in your chosen field</p>
+          <a href="#" class="feature-btn">Browse Resources</a>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon js-icon">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <h3>AI Resume Builder</h3>
+          <p>Generate professional, tailored resumes based on your progress and achievements</p>
+          <a href="#" class="feature-btn">Build Resume</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+      <div class="section-header">
+        <h2>Our Team</h2>
+        <p>The experts behind CareerQuest's success</p>
+      </div>
+      <div class="team-container">
+        <div class="team-member">
+          <div class="member-photo">
+            <img src="{{ url_for('static', filename='img/AasthaPurey.jpg') }}" alt="heroimage">
+          </div>
+          <h3>Aastha Purey</h3>
+          <p class="member-role">Founder & Career Strategist</p>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+          </div>
+        </div>
+        <div class="team-member">
+          <div class="member-photo">
+            <img src="{{ url_for('static', filename='img/Divyanshu.jpg') }}" alt="heroimage">
+          </div>
+          <h3>Divyanshu Kumar Singhal</h3>
+          <p class="member-role">Lead UX Designer</p>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-dribbble"></i></a>
+          </div>
+        </div>
+        <div class="team-member">
+          <div class="member-photo">
+            <img src="{{ url_for('static', filename='img/akhand.jpg') }}" alt="heroimage">
+          </div>
+          <h3>Akhand Pratap Tiwari</h3>
+          <p class="member-role">Full Stack Developer</p>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-stack-overflow"></i></a>
+          </div>
+        </div>
+        <div class="team-member">
+          <div class="member-photo">
+            <img src="{{ url_for('static', filename='img/Hitesh.jpg') }}" alt="heroimage">
+          </div>
+          <h3>Hitesh Sharma</h3>
+          <p class="member-role">AI & ML Specialist</p>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-medium"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-column">
+          <div class="footer-logo">CareerQuest</div>
+          <p>Bridging the gap between education and industry requirements since 2025</p>
+          <div class="footer-social">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h4>Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Career Paths</a></li>
+            <li><a href="#">Success Stories</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Resources</h4>
+          <ul class="footer-links">
+            <li><a href="#">Tech Blogs</a></li>
+            <li><a href="#">Alumni Network</a></li>
+            <li><a href="#">Resume Templates</a></li>
+            <li><a href="#">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>Contact Us</h4>
+          <address>
+            <p><i class="fas fa-map-marker-alt"></i> College Campus, Tech City, India</p>
+            <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+            <p><i class="fas fa-envelope"></i> info@careerquest.edu</p>
+          </address>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 CareerQuest. All Rights Reserved.</p>
+      </div>
+    </footer>
+    
+    <script>
+      // Add any JavaScript you might need here
+    </script>
   </body>
 </html>
 {% endblock %}

@@ -98,23 +98,13 @@ body {
     overflow: hidden;
 }
 
-.wave-shape {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 30%;
-    background: white;
-    clip-path: polygon(0 45%, 100% 0, 100% 100%, 0% 100%);
-}
-
 .hero-content {
     max-width: 600px;
     z-index: 1;
 }
 
 .hero-content h1 {
-    font-size: 3.5rem;
+    font-size: 3.2rem;
     color: #312E81;
     margin-bottom: 1rem;
 }
@@ -122,7 +112,7 @@ body {
 .hero-content p {
     color: #6B7280;
     margin-bottom: 2rem;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
 }
 
 .button-container {
@@ -230,4 +220,368 @@ body {
     .hero-section {
         padding: 2rem 1.5rem;
     }
+}
+
+/* Add these styles to your existing landing.css file */
+
+/* Features Section Styles */
+.features-section {
+    padding: 5rem 5%;
+    background-color: #F9FAFB;
+    text-align: center;
+}
+
+.section-header {
+    max-width: 700px;
+    margin: 0 auto 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    color: #312E81;
+    margin-bottom: 1rem;
+}
+
+.section-header p {
+    color: #6B7280;
+    font-size: 1.1rem;
+}
+
+.features-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.feature-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    width: 280px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    font-size: 2rem;
+}
+
+.code-icon {
+    background: linear-gradient(45deg, #F97316, #F59E0B);
+}
+
+.css-icon {
+    background: linear-gradient(45deg, #8B5CF6, #A855F7);
+}
+
+.html-icon {
+    background: linear-gradient(45deg, #6366F1, #8B5CF6);
+}
+
+.js-icon {
+    background: linear-gradient(45deg, #10B981, #059669);
+}
+
+.feature-card h3 {
+    font-size: 1.3rem;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.feature-card p {
+    color: #6B7280;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.feature-btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid #3B82F6;
+    color: #3B82F6;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.feature-btn:hover {
+    background: #3B82F6;
+    color: white;
+}
+
+/* Team Section Styles */
+.team-section {
+    padding: 5rem 5%;
+    background-color: white;
+    text-align: center;
+}
+
+.team-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+    margin-top: 3rem;
+}
+
+.team-member {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    width: 250px;
+    transition: transform 0.3s ease;
+}
+
+.team-member:hover {
+    transform: translateY(-10px);
+}
+
+.member-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 1.5rem;
+    border: 5px solid #E5E7EB;
+}
+
+.member-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.team-member h3 {
+    font-size: 1.3rem;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.member-role {
+    color: #6B7280;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #F3F4F6;
+    color: #4B5563;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: #3B82F6;
+    color: white;
+}
+
+/* Footer Styles */
+.footer {
+    background: #1E293B;
+    color: white;
+    padding: 4rem 5% 2rem;
+}
+
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3rem;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+}
+
+.footer-column {
+    flex: 1;
+    min-width: 250px;
+}
+
+.footer-logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.footer-column p {
+    color: #CBD5E1;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.footer-social {
+    display: flex;
+    gap: 1rem;
+}
+
+.footer-social a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.footer-social a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+}
+
+.footer-column h4 {
+    color: white;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.footer-column h4::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: #3B82F6;
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-links a {
+    color: #CBD5E1;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #3B82F6;
+}
+
+address p {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-bottom p {
+    color: #94A3B8;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design for New Sections */
+@media screen and (max-width: 968px) {
+    .section-header h2 {
+        font-size: 2.2rem;
+    }
+    
+    .feature-card {
+        width: 250px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .section-header h2 {
+        font-size: 2rem;
+    }
+    
+    .features-container, .team-container {
+        gap: 1.5rem;
+    }
+    
+    .feature-card, .team-member {
+        width: 100%;
+        max-width: 350px;
+    }
+    
+    .footer-container {
+        gap: 2rem;
+    }
+    
+    .footer-column {
+        min-width: 200px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .features-section, .team-section {
+        padding: 3rem 1.5rem;
+    }
+    
+    .footer {
+        padding: 3rem 1.5rem 1.5rem;
+    }
+    
+    .footer-column {
+        flex: 100%;
+    }
+}
+
+.hero-image {
+    max-width: 500px;
+    z-index: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.hero-image img:hover {
+    transform: translateY(-10px);
 }
