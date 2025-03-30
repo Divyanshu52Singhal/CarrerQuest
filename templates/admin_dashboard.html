@@ -4,27 +4,6 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
-<style>
-    .action-buttons {
-        display: flex;
-        gap: 8px;
-        margin-top: 8px;
-    }
-    .edit-button {
-        padding: 4px 8px;
-        font-size: 0.9em;
-    }
-    .secondary-button {
-        background-color: #5a6268;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .edit-button:hover {
-        background-color: #4c545a;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -36,19 +15,10 @@
     <div id="roadmap-section">
         {% for roadmap in roadmaps %}
             <div class="roadmap-card">
-                <div class="roadmap-header">
-                    <button class="toggle-button gradient-button" onclick="toggleVisibility('roadmap-{{ loop.index }}')">
-                        {{ roadmap.title }}
-                    </button>
-                    <span class="roadmap-description">&#8594; {{ roadmap.description }}</span>
-                </div>
-                
-                <div class="action-buttons">
-                    <a href="{{ url_for('admin_edit_roadmap', roadmap_id=roadmap.roadmap_id) }}" 
-                       class="edit-button secondary-button">
-                       Edit Roadmap
-                    </a>
-                </div>
+                <button class="toggle-button gradient-button" onclick="toggleVisibility('roadmap-{{ loop.index }}')">
+                    {{ roadmap.title }}
+                </button>
+                <span class="roadmap-description">&#8594; {{ roadmap.description }}</span>
 
                 <div id="roadmap-{{ loop.index }}" class="collapsible-content" style="display: none;">
                     <ul class="course-list">
@@ -57,15 +27,9 @@
                                 <div class="course-header">
                                     <strong>{{ course.name }}</strong>
                                     <p class="course-description">{{ course.description }}</p>
-                                    <div class="action-buttons">
-                                        <button class="toggle-button secondary-button" onclick="toggleVisibility('course-{{ course.name}}')">
-                                            View Chapters
-                                        </button>
-                                        <a href="{{ url_for('admin_edit_course', roadmap_id=roadmap.roadmap_id, course_id=course.course_id) }}" 
-                                           class="edit-button secondary-button">
-                                           Edit Course
-                                        </a>
-                                    </div>
+                                    <button class="toggle-button secondary-button" onclick="toggleVisibility('course-{{ course.name}}')">
+                                        View Chapters
+                                    </button>
                                 </div>
                                 <ul id="course-{{course.name}}" class="chapter-list collapsible-content" style="display: none;">
                                     {% for chapter in course.chapters %}
@@ -75,12 +39,7 @@
                                                rel="noopener noreferrer">
                                                Reference
                                             </a>
-                                            
-                                        {% endif %}
-                                        <a href="{{ url_for('create_quiz', roadmap_id=roadmap.roadmap_id, course_id=course.course_id, chapter_title=chapter.title) }}" 
-                                        class="btn btn-sm btn-secondary">
-                                        Create/Edit Quiz
-                                     </a></li>
+                                        {% endif %}</li>
                                     {% endfor %}
                                 </ul>
                             </li>
@@ -91,7 +50,6 @@
         {% endfor %}
     </div>
 </div>
-
 
 <!-- Students Section -->
 <div class="dashboard-section">
@@ -181,8 +139,8 @@
                 <td class="column-email">${student.email}</td>
                 <td class="column-cgpa">${student.cgpa}</td>
                 ${roadmaps.map(roadmap => {
-                    const completionRate = student.completion_rate[roadmap.roadmap_id] || 0;
-                    return <td class="column-${roadmap.roadmap_id}">${completionRate}%</td>;
+                    const completionRate = Math.round(student.completion_rate[roadmap.roadmap_id]) || 0;
+                    return `<td class="column-${roadmap.roadmap_id}">${completionRate}%</td>`;
                 }).join('')}
             `;
             tableBody.appendChild(row);
@@ -283,28 +241,51 @@
 
     // Export data to CSV
     function exportToCSV() {
-        const rows = [
-            ["Name", "Email", "CGPA", ...roadmaps.map(roadmap => roadmap.title + " Completion Rate")]
-        ];
+        // Get visible headers (considering column filters)
+    const headers = Array.from(document.querySelectorAll("#students-table thead th"))
+        .filter(th => th.style.display !== 'none')
+        .map(th => th.textContent.trim());
 
-        const tableRows = document.querySelectorAll("#students-table tbody tr");
-        tableRows.forEach(row => {
-            const cells = row.querySelectorAll("td");
-            const rowData = Array.from(cells).map(cell => cell.textContent);
-            rows.push(rowData);
-        });
+    // Initialize rows with filtered headers
+    const rows = [headers];
 
-        let csvContent = "data:text/csv;charset=utf-8," 
-            + rows.map(e => e.join(",")).join("\n");
+    // Get visible rows and their visible cells
+    const tableRows = document.querySelectorAll("#students-table tbody tr");
+    tableRows.forEach(row => {
+        // Only process visible rows
+        if (row.style.display !== 'none') {
+            const visibleCells = Array.from(row.querySelectorAll("td"))
+                .filter(cell => cell.style.display !== 'none')
+                .map(cell => {
+                    // Remove % symbol from completion rates and handle special characters
+                    let content = cell.textContent.trim();
+                    if (content.endsWith('%')) {
+                        content = content.slice(0, -1);
+                    }
+                    // Escape CSV special characters
+                    if (content.includes(',') || content.includes('"') || content.includes('\n')) {
+                        content = `"${content.replace(/"/g, '""')}"`;
+                    }
+                    return content;
+                });
+            rows.push(visibleCells);
+        }
+    });
 
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "students_data.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+    // Generate CSV content
+    let csvContent = "data:text/csv;charset=utf-8,"
+        + rows.map(row => row.join(",")).join("\n");
+
+    // Create and trigger download
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    link.setAttribute("download", `students_data_${timestamp}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 
     // Combine sorting and filtering functionality
     document.getElementById("apply-button").addEventListener("click", () => {
