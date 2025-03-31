@@ -12,7 +12,7 @@ from resume_generator import ResumeGenerator
 from io import BytesIO
 
 # Load environment variables
-load_dotenv(dotenv_path="process.env")
+load_dotenv(dotenv_path=".env")
 app = Flask(__name__)
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 app.config["SECRET_KEY"] = "password"
