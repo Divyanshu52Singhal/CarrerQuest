@@ -1,4 +1,5 @@
 {% block content %}
+<div class="main-container">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -187,6 +188,11 @@
         </div>
     </form>
 </div>
+<!-- PDF Preview Section -->
+<div class="pdf-preview-container">
+   <iframe id="pdfPreview" style="width: 100%; height: 100%; border: none;" src=""></iframe>
+</div>
+</div>
 {% endblock %}
 
 <script>
@@ -352,11 +358,9 @@
             // Create a URL for the blob
             const pdfUrl = window.URL.createObjectURL(blob);
 
-            // Open the PDF in a new tab
-            const newWindow = window.open(pdfUrl, "_blank");
-            if (!newWindow) {
-                alert("Please allow popups for this website to view the preview.");
-            }
+            // Load the PDF into the iframe
+            const pdfPreview = document.getElementById("pdfPreview");
+            pdfPreview.src = pdfUrl;
 
             // Optionally revoke the object URL after some time to free memory
             setTimeout(() => {

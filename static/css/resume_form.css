@@ -1,5 +1,23 @@
 /* General Form Container */
+.main-container {
+    display: flex;
+    height: 100vh; /* Full height of the viewport */
+}
+
 .form-container {
+    flex: 1; /* Take up half the width */
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    border-right: 1px solid #ddd;
+}
+
+.pdf-preview-container {
+    flex: 1; /* Take up the other half of the width */
+    background-color: #fff;
+}
+
+/* .form-container {
     max-width: 1000px;
     margin: 20px auto;
     padding: 30px;
@@ -7,7 +25,7 @@
     border-radius: 12px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     font-family: 'Arial', sans-serif;
-}
+} */
 
 /* Form Header */
 .form-header {
