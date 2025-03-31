@@ -53,7 +53,7 @@ class InfoFormatters:
         entries = []
         for category, skills in skills_data.items():
             skills_str = ", ".join(skills)
-            entries.append(f"\\textbf{{{category}}}{{: {skills_str}}}")
+            entries.append(f"\\textbf{{{category.replace('_', ' ')}}}{{: {skills_str}}}")
         
         return " \\\\\n     ".join(entries)
     
@@ -75,6 +75,7 @@ class InfoFormatters:
                 for category, items in section_data.items():
                     items_str = ", ".join(items)
                     entries.append(f"     \\textbf{{{category}}}{{: {items_str}}}")
+                    # print(category.replace('_', ' '))
                 section += " \\\\\n".join(entries)
             elif isinstance(section_data, list):
                 # Handle list of bullet points
@@ -82,5 +83,5 @@ class InfoFormatters:
             
             section += "\n    }}\n \\end{itemize}\n\n"
             sections.append(section)
-            
+        
         return "\n".join(sections)

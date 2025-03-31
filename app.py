@@ -826,36 +826,49 @@ def resume_form():
     if not student:
         return redirect(url_for("student_login"))
     
-    # Get student's roadmaps and courses for education section
-    education_data = []
-    projects_data = []
-    skills = {"Languages": [], "Frameworks": [], "Developer Tools": [], "Libraries": []}    
-    form_data = {
-        "personal_info": {
-            "name": student.get("name", ""),
-            "email": student.get("email", ""),
-            "phone": student.get("phone", ""),
-            "linkedin_url": student.get("linkedin_url", ""),
-            "github_url": student.get("github_url", "")
-        },
-        "education": education_data,
-        "projects": projects_data,
-        "skills": skills,
-        "cgpa": student.get("cgpa", "")
-    }
+    # Load default resume data from JSON file
+    with open('example_resume_data.json', 'r') as f:
+        default_data = json.load(f)
+
+    # Merge student data with default data
+    # form_data = {
+    #     "name": student.get("name", default_data.get("name", "")),
+    #     "email": student.get("email", default_data.get("email", "")),
+    #     "phone": student.get("phone", default_data.get("phone", "")),
+    #     "linkedin_url": student.get("linkedin_url", default_data.get("linkedin_url", "")),
+    #     "linkedin_display": student.get("linkedin_display", default_data.get("linkedin_display", "")),
+    #     "github_url": student.get("github_url", default_data.get("github_url", "")),
+    #     "github_display": student.get("github_display", default_data.get("github_display", "")),
+    #     "education": student.get("education", default_data.get("education", [])),
+    #     "experience": student.get("experience", default_data.get("experience", [])),
+    #     "projects": student.get("projects", default_data.get("projects", [])),
+    #     "skills": student.get("skills", default_data.get("skills", {
+    #         "Languages": [],
+    #         "Frameworks": [],
+    #         "Developer Tools": [],
+    #         "Libraries": []
+    #     })),
+    #     "additional_sections": student.get("additional_sections", default_data.get("additional_sections", {
+    #         "Certifications": {
+    #             "AWS": [],
+    #             "Microsoft": [],
+    #             "Other": []
+    #         }
+    #     }))
+    # }
     
-    return render_template('resume_form.html', form_data=form_data)
+    return render_template('resume_form.html', form_data=default_data)
 
 @app.route('/generate', methods=['POST'])
 def generate_resume():
     if not request.is_json:
         return {"error": "Content-Type must be application/json"}, 400
-    
     data = request.get_json()
+    # print(data)
     
     # Generate LaTeX content
     latex_content = ResumeGenerator.from_json(data, "./resume_template.tex")
-    
+    # print(latex_content)
     # Create in-memory file
     mem_file = BytesIO(latex_content.encode('utf-8'))
     

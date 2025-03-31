@@ -1,3 +1,4 @@
+import json
 import jinja2
 from input_sanitizer import sanitize_latex_input
 from info_formatters import InfoFormatters 
@@ -31,6 +32,10 @@ class ResumeGenerator:
         """
         # print(type(data))
         data = sanitize_latex_input(data)
+        # print(data)
+        # Write data to JSON file for debugging/reference
+        with open('processed_data.json', 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
         # Process template placeholders
         context = {
             "full_name": data.get("name", "Your Name"),

@@ -1,10 +1,11 @@
-{% extends "base.html" %}
-
-{% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/resume_form.css') }}">
-{% endblock %}
-
 {% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Generator</title>
+    <!-- Link to the CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resume_form.css') }}">
+</head>
 <div class="form-container">
     <div class="form-header">
         <h1>Resume Generator</h1>
@@ -21,40 +22,32 @@
             <div class="input-group">
                 <div class="form-group">
                     <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" value="{{ form_data.personal_info.name }}" required>
+                    <input type="text" id="name" name="name" value="{{ form_data.name }}" required>
                 </div>
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" value="{{ form_data.personal_info.email }}" readonly required>
+                    <input type="email" id="email" name="email" value="{{ form_data.email }}" readonly required>
                 </div>
             </div>
             <div class="input-group">
                 <div class="form-group">
                     <label for="phone">Phone</label>
-                    <input type="tel" id="phone" name="phone" value="{{ form_data.personal_info.phone }}" 
-                           placeholder="e.g., 123-456-7890">
+                    <input type="tel" id="phone" name="phone" value="{{ form_data.phone }}" placeholder="e.g., 123-456-7890">
                 </div>
                 <div class="form-group">
-                    <label for="cgpa">CGPA</label>
-                    <input type="text" id="cgpa" name="cgpa" value="{{ form_data.cgpa }}" 
-                           placeholder="e.g., 3.8">
+                    <label for="linkedin_url">LinkedIn URL</label>
+                    <input type="url" id="linkedin_url" name="linkedin_url" value="{{ form_data.linkedin_url }}" placeholder="e.g., https://linkedin.com/in/yourprofile">
                 </div>
             </div>
             <div class="input-group">
                 <div class="form-group">
-                    <label for="linkedin_url">LinkedIn URL</label>
-                    <input type="url" id="linkedin_url" name="linkedin_url" value="{{ form_data.personal_info.linkedin_url }}" 
-                           placeholder="e.g., https://linkedin.com/in/yourprofile">
-                </div>
-                <div class="form-group">
                     <label for="github_url">GitHub URL</label>
-                    <input type="url" id="github_url" name="github_url" value="{{ form_data.personal_info.github_url }}" 
-                           placeholder="e.g., https://github.com/yourusername">
+                    <input type="url" id="github_url" name="github_url" value="{{ form_data.github_url }}" placeholder="e.g., https://github.com/yourusername">
                 </div>
             </div>
         </div>
 
-        <!-- Education -->
+        <!-- Education Section -->
         <div class="form-section">
             <h2>Education</h2>
             <div id="education-container">
@@ -62,28 +55,19 @@
                 <div class="dynamic-section">
                     <div class="form-group">
                         <label for="education-institution-{{ loop.index0 }}">Institution</label>
-                        <input type="text" id="education-institution-{{ loop.index0 }}" 
-                               name="education-institution-{{ loop.index0 }}" 
-                               value="{{ edu.institution }}" required>
+                        <input type="text" id="education-institution-{{ loop.index0 }}" name="education-institution-{{ loop.index0 }}" value="{{ edu.institution }}" required>
                     </div>
                     <div class="form-group">
                         <label for="education-location-{{ loop.index0 }}">Location</label>
-                        <input type="text" id="education-location-{{ loop.index0 }}" 
-                               name="education-location-{{ loop.index0 }}" 
-                               value="{{ edu.location }}" required>
+                        <input type="text" id="education-location-{{ loop.index0 }}" name="education-location-{{ loop.index0 }}" value="{{ edu.location }}" required>
                     </div>
                     <div class="form-group">
                         <label for="education-degree-{{ loop.index0 }}">Degree</label>
-                        <input type="text" id="education-degree-{{ loop.index0 }}" 
-                               name="education-degree-{{ loop.index0 }}" 
-                               value="{{ edu.degree }}" required>
+                        <input type="text" id="education-degree-{{ loop.index0 }}" name="education-degree-{{ loop.index0 }}" value="{{ edu.degree }}" required>
                     </div>
                     <div class="form-group">
                         <label for="education-duration-{{ loop.index0 }}">Duration</label>
-                        <input type="text" id="education-duration-{{ loop.index0 }}" 
-                               name="education-duration-{{ loop.index0 }}" 
-                               value="{{ edu.duration }}" 
-                               placeholder="e.g., Aug 2018 - May 2021" required>
+                        <input type="text" id="education-duration-{{ loop.index0 }}" name="education-duration-{{ loop.index0 }}" value="{{ edu.duration }}" placeholder="e.g., Aug 2018 - May 2021" required>
                     </div>
                     <button type="button" class="btn btn-danger remove-section">Remove</button>
                 </div>
@@ -92,42 +76,34 @@
             <button type="button" class="btn btn-primary" id="add-education">Add Education</button>
         </div>
 
-        <!-- Projects -->
+        <!-- Experience Section -->
         <div class="form-section">
-            <h2>Projects</h2>
-            <div id="project-container">
-                {% for project in form_data.projects %}
+            <h2>Experience</h2>
+            <div id="experience-container">
+                {% for exp in form_data.experience %}
                 <div class="dynamic-section">
                     <div class="form-group">
-                        <label for="project-name-{{ loop.index0 }}">Project Name</label>
-                        <input type="text" id="project-name-{{ loop.index0 }}" 
-                               name="project-name-{{ loop.index0 }}" 
-                               value="{{ project.name }}" required>
+                        <label for="experience-title-{{ loop.index0 }}">Job Title</label>
+                        <input type="text" id="experience-title-{{ loop.index0 }}" name="experience-title-{{ loop.index0 }}" value="{{ exp.title }}" required>
                     </div>
                     <div class="form-group">
-                        <label for="project-technologies-{{ loop.index0 }}">Technologies Used</label>
-                        <input type="text" id="project-technologies-{{ loop.index0 }}" 
-                               name="project-technologies-{{ loop.index0 }}" 
-                               value="{{ project.technologies }}" 
-                               placeholder="e.g., Python, Flask, React, PostgreSQL" required>
+                        <label for="experience-organization-{{ loop.index0 }}">Organization</label>
+                        <input type="text" id="experience-organization-{{ loop.index0 }}" name="experience-organization-{{ loop.index0 }}" value="{{ exp.organization }}" required>
                     </div>
                     <div class="form-group">
-                        <label for="project-duration-{{ loop.index0 }}">Duration</label>
-                        <input type="text" id="project-duration-{{ loop.index0 }}" 
-                               name="project-duration-{{ loop.index0 }}" 
-                               value="{{ project.duration }}" 
-                               placeholder="e.g., June 2020 - Present" required>
+                        <label for="experience-location-{{ loop.index0 }}">Location</label>
+                        <input type="text" id="experience-location-{{ loop.index0 }}" name="experience-location-{{ loop.index0 }}" value="{{ exp.location }}" required>
                     </div>
                     <div class="form-group">
-                        <label>Bullet Points (Achievements/Responsibilities)</label>
+                        <label for="experience-duration-{{ loop.index0 }}">Duration</label>
+                        <input type="text" id="experience-duration-{{ loop.index0 }}" name="experience-duration-{{ loop.index0 }}" value="{{ exp.duration }}" placeholder="e.g., Jan 2020 - Dec 2021" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Responsibilities/Achievements</label>
                         <div class="bullet-points">
-                            {% for bullet in project.bullets %}
+                            {% for bullet in exp.bullets %}
                             <div class="bullet-point">
-                                <input type="text" 
-                                    name="project-bullet-{{ loop.index0 }}-{{ loop.index0 }}" 
-                                    id="project-bullet-{{ loop.index0 }}-{{ loop.index0 }}"
-                                    value="{{ bullet }}" 
-                                    placeholder="Enter bullet point...">
+                                <input type="text" name="experience-bullet-{{ loop.index0 }}-{{ loop.index }}" value="{{ bullet }}" placeholder="Enter responsibility or achievement...">
                                 {% if loop.first %}
                                 <button type="button" class="btn btn-sm btn-primary add-bullet">+</button>
                                 {% else %}
@@ -135,13 +111,46 @@
                                 {% endif %}
                             </div>
                             {% endfor %}
-                            {% if not project.bullets %}
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-danger remove-section">Remove</button>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" class="btn btn-primary" id="add-experience">Add Experience</button>
+        </div>
+
+        <!-- Projects Section -->
+        <div class="form-section">
+            <h2>Projects</h2>
+            <div id="project-container">
+                {% for project in form_data.projects %}
+                <div class="dynamic-section">
+                    <div class="form-group">
+                        <label for="project-name-{{ loop.index0 }}">Project Name</label>
+                        <input type="text" id="project-name-{{ loop.index0 }}" name="project-name-{{ loop.index0 }}" value="{{ project.name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="project-technologies-{{ loop.index0 }}">Technologies Used</label>
+                        <input type="text" id="project-technologies-{{ loop.index0 }}" name="project-technologies-{{ loop.index0 }}" value="{{ project.technologies }}" placeholder="e.g., Python, Flask, React" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="project-duration-{{ loop.index0 }}">Duration</label>
+                        <input type="text" id="project-duration-{{ loop.index0 }}" name="project-duration-{{ loop.index0 }}" value="{{ project.duration }}" placeholder="e.g., 3 months" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Details</label>
+                        <div class="bullet-points">
+                            {% for bullet in project.bullets %}
                             <div class="bullet-point">
-                                <input type="text" name="project-bullet-{{ loop.index0 }}-0" 
-                                       placeholder="Enter bullet point...">
+                                <input type="text" name="project-bullet-{{ loop.index0 }}-{{ loop.index }}" value="{{ bullet }}" placeholder="Enter project detail...">
+                                {% if loop.first %}
                                 <button type="button" class="btn btn-sm btn-primary add-bullet">+</button>
+                                {% else %}
+                                <button type="button" class="btn btn-sm btn-danger remove-bullet">-</button>
+                                {% endif %}
                             </div>
-                            {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
                     <button type="button" class="btn btn-danger remove-section">Remove</button>
@@ -151,357 +160,201 @@
             <button type="button" class="btn btn-primary" id="add-project">Add Project</button>
         </div>
 
-        <!-- Skills -->
+        <!-- Skills Section -->
         <div class="form-section">
             <h2>Skills</h2>
             <div id="skills-container">
                 {% for category, skills in form_data.skills.items() %}
                 <div class="form-group">
                     <label for="skills-{{ category }}">{{ category }} (comma-separated)</label>
-                    <input type="text" id="skills-{{ category }}" name="skills-{{ category }}" 
-                           value="{{ skills|join(', ') }}" 
-                           placeholder="Enter {{ category.lower() }}...">
+                    <input type="text" id="skills-{{ category }}" name="skills-{{ category }}" value="{{ skills|join(', ') }}" placeholder="Enter {{ category.lower() }}...">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Additional Sections -->
+        <div class="form-section">
+            <h2>Certifications</h2>
+            <div id="certifications-container">
+                {% for category, certifications in form_data.additional_sections.Certifications.items() %}
+                <div class="form-group">
+                    <label for="certifications-{{ category }}">{{ category }} Certifications (comma-separated)</label>
+                    <input type="text" id="certifications-{{ category }}" name="certifications-{{ category }}" value="{{ certifications|join(', ') }}" placeholder="Enter {{ category.lower() }} certifications...">
                 </div>
                 {% endfor %}
             </div>
         </div>
     </form>
-
-    <div id="previewContainer" class="preview-container"></div>
 </div>
+{% endblock %}
 
 <script>
-// Initialization when the document loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Add event listeners for the buttons
-    document.getElementById('previewBtn').addEventListener('click', previewResume);
-    document.getElementById('generateBtn').addEventListener('click', generateResume);
-    
-    // Add event listeners for dynamic section buttons
-    document.getElementById('add-education').addEventListener('click', addEducationSection);
-    document.getElementById('add-project').addEventListener('click', addProjectSection);
-    
-    // Add event listeners to remove buttons (for existing sections)
-    document.querySelectorAll('.remove-section').forEach(button => {
-        button.addEventListener('click', removeSection);
-    });
-    
-    // Add event listeners to add bullet buttons (for existing sections)
-    document.querySelectorAll('.add-bullet').forEach(button => {
-        button.addEventListener('click', addBulletPoint);
-    });
-    
-    // Add event listeners to remove bullet buttons (for existing sections)
-    document.querySelectorAll('.remove-bullet').forEach(button => {
-        button.addEventListener('click', removeBulletPoint);
-    });
-});
+    document.addEventListener("DOMContentLoaded", function () {
+        function collectFormData() {
+            const formData = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                linkedin_url: document.getElementById("linkedin_url").value,
+                linkedin_display: document.getElementById("linkedin_url").value.replace("https://", ""),
+                github_url: document.getElementById("github_url").value,
+                github_display: document.getElementById("github_url").value.replace("https://", ""),
+                education: [],
+                experience: [],
+                projects: [],
+                skills: {
+                    Languages: document.getElementById("skills-Languages").value.split(",").map(s => s.trim()),
+                    Frameworks: document.getElementById("skills-Frameworks").value.split(",").map(s => s.trim()),
+                    Developer_Tools: document.getElementById("skills-Developer Tools").value.split(",").map(s => s.trim()),
+                    Libraries: document.getElementById("skills-Libraries").value.split(",").map(s => s.trim())
+                },
+                additional_sections: {
+                    Certifications: {
+                        AWS: document.getElementById("certifications-AWS").value.split(",").map(s => s.trim()),
+                        Microsoft: document.getElementById("certifications-Microsoft").value.split(",").map(s => s.trim()),
+                        Other: document.getElementById("certifications-Other").value.split(",").map(s => s.trim())
+                    }
+                }
+            };
 
-// Build JSON data from form inputs
-function buildJsonData() {
-    // Get personal information
-    const personalInfo = {
-        name: document.getElementById('name').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        phone: document.getElementById('phone')?.value.trim() || '',
-        linkedin_url: document.getElementById('linkedin_url')?.value.trim() || '',
-        linkedin_display: document.getElementById('linkedin_url')?.value.trim().replace(/^https?:\/\//, '') || '',
-        github_url: document.getElementById('github_url')?.value.trim() || '',
-        github_display: document.getElementById('github_url')?.value.trim().replace(/^https?:\/\//, '') || '',
-    };
-    
-    // Get education information
-    const education = [];
-    const educationSections = document.querySelectorAll('#education-container .dynamic-section');
-    educationSections.forEach(section => {
-        const educationItem = {
-            institution: section.querySelector('[name^="education-institution"]').value.trim(),
-            location: section.querySelector('[name^="education-location"]').value.trim(),
-            degree: section.querySelector('[name^="education-degree"]').value.trim(),
-            duration: section.querySelector('[name^="education-duration"]').value.trim()
-        };
-        education.push(educationItem);
-    });
-    
-    // Get projects information
-    const projects = [];
-    const projectSections = document.querySelectorAll('#project-container .dynamic-section');
-    projectSections.forEach(section => {
-        const bulletInputs = section.querySelectorAll('[name^="project-bullet"]');
-        const bullets = [];
-        bulletInputs.forEach(input => {
-            if (input.value.trim()) {
-                bullets.push(input.value.trim());
-            }
-        });
-        
-        const projectItem = {
-            name: section.querySelector('[name^="project-name"]').value.trim(),
-            technologies: section.querySelector('[name^="project-technologies"]').value.trim(),
-            duration: section.querySelector('[name^="project-duration"]').value.trim(),
-            bullets: bullets
-        };
-        projects.push(projectItem);
-    });
-    
-    // Get skills information
-    const skills = {};
-    const skillsInputs = document.querySelectorAll('#skills-container input');
-    skillsInputs.forEach(input => {
-        const category = input.id.replace('skills-', '');
-        const skillsList = input.value.split(',').map(skill => skill.trim()).filter(skill => skill);
-        if (skillsList.length > 0) {
-            skills[category] = skillsList;
-        }
-    });
-    
-    // Build the complete JSON data
-    const jsonData = {
-        ...personalInfo,
-        education,
-        projects,
-        skills,
-        cgpa: document.getElementById('cgpa')?.value.trim() || ''
-    };
-    
-    // Add form validation
-    if (!validateForm()) {
-        throw new Error('Please fill in all required fields');
-    }
-    
-    return jsonData;
-}
-
-// Validate the form
-function validateForm() {
-    const requiredFields = document.querySelectorAll('[required]');
-    let isValid = true;
-
-    requiredFields.forEach(field => {
-        if (!field.value.trim()) {
-            field.classList.add('error');
-            isValid = false;
-        } else {
-            field.classList.remove('error');
-        }
-    });
-
-    return isValid;
-}
-
-// Preview the resume
-function previewResume() {
-    try {
-        const jsonData = buildJsonData();
-        
-        // Show loading indicator
-        document.getElementById('previewContainer').innerHTML = '<div class="loading">Generating preview...</div>';
-        
-        // Send data to server for preview
-        fetch('/preview', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(jsonData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                showError(data.error);
-            } else {
-                // Display the preview
-                const previewContainer = document.getElementById('previewContainer');
-                previewContainer.innerHTML = `<pre>${escapeHtml(data.content)}</pre>`;
-                previewContainer.classList.add('visible');
-            }
-        })
-        .catch(error => {
-            showError('An error occurred while generating the preview.');
-            console.error('Error:', error);
-        });
-    } catch (error) {
-        showError(error.message);
-    }
-}
-
-// Generate and download the resume
-function generateResume() {
-    try {
-        const jsonData = buildJsonData();
-        
-        // Send data to server for generation
-        fetch('/generate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(jsonData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
-                    throw new Error(data.error || 'Failed to generate resume');
+            // Collect education data
+            document.querySelectorAll("#education-container .dynamic-section").forEach(section => {
+                formData.education.push({
+                    institution: section.querySelector("[name^='education-institution']").value,
+                    location: section.querySelector("[name^='education-location']").value,
+                    degree: section.querySelector("[name^='education-degree']").value,
+                    duration: section.querySelector("[name^='education-duration']").value
                 });
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            // Create download link
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'resume.tex';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        })
-        .catch(error => {
-            showError(error.message);
-            console.error('Error:', error);
+            });
+
+            // Collect experience data
+            document.querySelectorAll("#experience-container .dynamic-section").forEach(section => {
+                const bullets = [];
+                section.querySelectorAll("[name^='experience-bullet']").forEach(bullet => {
+                    bullets.push(bullet.value);
+                });
+
+                formData.experience.push({
+                    title: section.querySelector("[name^='experience-title']").value,
+                    organization: section.querySelector("[name^='experience-organization']").value,
+                    location: section.querySelector("[name^='experience-location']").value,
+                    duration: section.querySelector("[name^='experience-duration']").value,
+                    bullets: bullets
+                });
+            });
+
+            // Collect project data
+            document.querySelectorAll("#project-container .dynamic-section").forEach(section => {
+                const bullets = [];
+                section.querySelectorAll("[name^='project-bullet']").forEach(bullet => {
+                    bullets.push(bullet.value);
+                });
+
+                formData.projects.push({
+                    name: section.querySelector("[name^='project-name']").value,
+                    technologies: section.querySelector("[name^='project-technologies']").value,
+                    duration: section.querySelector("[name^='project-duration']").value,
+                    bullets: bullets
+                });
+            });
+
+            return formData;
+        }
+
+
+        // Add dynamic sections for Education, Experience, and Projects
+        function addDynamicSection(containerId, templateId) {
+            const container = document.getElementById(containerId);
+            const template = document.getElementById(templateId).content.cloneNode(true);
+            container.appendChild(template);
+        }
+
+        // Add Education
+        document.getElementById("add-education").addEventListener("click", function () {
+            addDynamicSection("education-container", "education-template");
         });
-    } catch (error) {
-        showError(error.message);
-    }
-}
 
-// Add a new education section
-function addEducationSection() {
-    const container = document.getElementById('education-container');
-    const sectionCount = container.querySelectorAll('.dynamic-section').length;
-    
-    const newSection = document.createElement('div');
-    newSection.className = 'dynamic-section';
-    newSection.innerHTML = `
-        <div class="form-group">
-            <label for="education-institution-${sectionCount}">Institution</label>
-            <input type="text" id="education-institution-${sectionCount}" name="education-institution-${sectionCount}" required>
-        </div>
-        <div class="form-group">
-            <label for="education-location-${sectionCount}">Location</label>
-            <input type="text" id="education-location-${sectionCount}" name="education-location-${sectionCount}" required>
-        </div>
-        <div class="form-group">
-            <label for="education-degree-${sectionCount}">Degree</label>
-            <input type="text" id="education-degree-${sectionCount}" name="education-degree-${sectionCount}" required>
-        </div>
-        <div class="form-group">
-            <label for="education-duration-${sectionCount}">Duration</label>
-            <input type="text" id="education-duration-${sectionCount}" name="education-duration-${sectionCount}" placeholder="e.g., Aug 2018 - May 2021" required>
-        </div>
-        <button type="button" class="btn btn-danger remove-section">Remove</button>
-    `;
-    
-    container.appendChild(newSection);
-    
-    // Add event listener to the new remove button
-    newSection.querySelector('.remove-section').addEventListener('click', removeSection);
-}
+        // Add Experience
+        document.getElementById("add-experience").addEventListener("click", function () {
+            addDynamicSection("experience-container", "experience-template");
+        });
 
-// Add a new project section
-function addProjectSection() {
-    const container = document.getElementById('project-container');
-    const sectionCount = container.querySelectorAll('.dynamic-section').length;
-    
-    const newSection = document.createElement('div');
-    newSection.className = 'dynamic-section';
-    newSection.innerHTML = `
-        <div class="form-group">
-            <label for="project-name-${sectionCount}">Project Name</label>
-            <input type="text" id="project-name-${sectionCount}" name="project-name-${sectionCount}" required>
-        </div>
-        <div class="form-group">
-            <label for="project-technologies-${sectionCount}">Technologies Used</label>
-            <input type="text" id="project-technologies-${sectionCount}" name="project-technologies-${sectionCount}" placeholder="e.g., Python, Flask, React, PostgreSQL" required>
-        </div>
-        <div class="form-group">
-            <label for="project-duration-${sectionCount}">Duration</label>
-            <input type="text" id="project-duration-${sectionCount}" name="project-duration-${sectionCount}" placeholder="e.g., June 2020 - Present" required>
-        </div>
-        <div class="form-group">
-            <label>Bullet Points (Achievements/Responsibilities)</label>
-            <div class="bullet-points">
-                <div class="bullet-point">
-                    <input type="text" name="project-bullet-${sectionCount}-0" placeholder="Enter bullet point...">
-                    <button type="button" class="btn btn-sm btn-primary add-bullet">+</button>
-                </div>
-            </div>
-        </div>
-        <button type="button" class="btn btn-danger remove-section">Remove</button>
-    `;
-    
-    container.appendChild(newSection);
-    
-    // Add event listeners
-    newSection.querySelector('.remove-section').addEventListener('click', removeSection);
-    newSection.querySelector('.add-bullet').addEventListener('click', addBulletPoint);
-}
+        // Add Project
+        document.getElementById("add-project").addEventListener("click", function () {
+            addDynamicSection("project-container", "project-template");
+        });
 
-// Remove a section
-function removeSection(event) {
-    const button = event.target;
-    const section = button.closest('.dynamic-section');
-    section.remove();
-}
+        // Add bullet points dynamically
+        document.addEventListener("click", function (event) {
+            if (event.target.classList.contains("add-bullet")) {
+                const bulletContainer = event.target.closest(".bullet-points");
+                const newBullet = document.createElement("div");
+                newBullet.classList.add("bullet-point");
+                newBullet.innerHTML = `
+                    <input type="text" placeholder="Enter detail...">
+                    <button type="button" class="btn btn-sm btn-danger remove-bullet">-</button>
+                `;
+                bulletContainer.appendChild(newBullet);
+            }
 
-// Add a new bullet point
-function addBulletPoint(event) {
-    const button = event.target;
-    const bulletPointsContainer = button.closest('.bullet-points');
-    const bulletPoints = bulletPointsContainer.querySelectorAll('.bullet-point');
-    const lastBulletPoint = bulletPoints[bulletPoints.length - 1];
-    
-    // Extract section and bullet index from the name of the last input
-    const lastInput = lastBulletPoint.querySelector('input');
-    const nameParts = lastInput.name.split('-');
-    const sectionIndex = nameParts[2];
-    const bulletIndex = parseInt(nameParts[3]) + 1;
-    
-    // Create new bullet point
-    const newBulletPoint = document.createElement('div');
-    newBulletPoint.className = 'bullet-point';
-    newBulletPoint.innerHTML = `
-        <input type="text" name="project-bullet-${sectionIndex}-${bulletIndex}" placeholder="Enter bullet point...">
-        <button type="button" class="btn btn-sm btn-danger remove-bullet">-</button>
-    `;
-    
-    bulletPointsContainer.appendChild(newBulletPoint);
-    
-    // Add event listener to the new remove button
-    newBulletPoint.querySelector('.remove-bullet').addEventListener('click', removeBulletPoint);
-}
+            // Remove bullet points dynamically
+            if (event.target.classList.contains("remove-bullet")) {
+                const bulletPoint = event.target.closest(".bullet-point");
+                bulletPoint.remove();
+            }
+        });
 
-// Remove a bullet point
-function removeBulletPoint(event) {
-    const button = event.target;
-    const bulletPoint = button.closest('.bullet-point');
-    bulletPoint.remove();
-}
+        // Remove dynamic sections
+        document.addEventListener("click", function (event) {
+            if (event.target.classList.contains("remove-section")) {
+                const section = event.target.closest(".dynamic-section");
+                section.remove();
+            }
+        });
 
-// Helper function to show errors
-function showError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'alert alert-danger';
-    errorDiv.textContent = message;
-    
-    const formContainer = document.querySelector('.form-container');
-    formContainer.insertBefore(errorDiv, formContainer.firstChild);
-    
-    // Remove error after 5 seconds
-    setTimeout(() => {
-        errorDiv.remove();
-    }, 5000);
-}
+        // Preview Resume
+        document.getElementById("previewBtn").addEventListener("click", function () {
+            const formData = new FormData(document.getElementById("resumeForm"));
+            fetch("/preview", {
+                method: "POST",
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle preview logic (e.g., open a modal or redirect to preview page)
+                    console.log("Preview data:", data);
+                })
+                .catch(error => console.error("Error:", error));
+        });
 
-// Helper function to escape HTML in preview
-function escapeHtml(unsafe) {
-    return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+        // Generate Resume
+        document.getElementById("generateBtn").addEventListener("click", function () {
+            // const formData = new FormData(document.getElementById("resumeForm"));
+            const formData = collectFormData();
+            console.log(formData);
+            fetch("/generate", {
+                method: "POST",
+                body: JSON.stringify(formData),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    a.href = url;
+                    a.download = "resume.tex";
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch(error => console.error("Error:", error));
+        });
+    });
 </script>
-{% endblock %}

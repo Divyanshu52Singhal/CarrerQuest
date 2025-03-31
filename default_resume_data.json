@@ -1,0 +1,137 @@
+{
+  "name": "Full Name",
+  "phone": "123-456-7890",
+  "email": "email@example.com",
+  "linkedin_url": "https://linkedin.com/in/username",
+  "linkedin_display": "linkedin.com/in/username",
+  "github_url": "https://github.com/username",
+  "github_display": "github.com/username",
+  "education": [
+    {
+      "institution": "University Name",
+      "location": "City, State",
+      "degree": "Degree Name",
+      "duration": "Start Year - End Year"
+    },
+    {
+      "institution": "High School Name",
+      "location": "City, State",
+      "degree": "Diploma Name",
+      "duration": "Start Year - End Year"
+    }
+  ],
+  "experience": [
+    {
+      "title": "Job Title",
+      "organization": "Company Name",
+      "location": "City, State",
+      "duration": "Start Year - End Year",
+      "bullets": [
+        "Responsibility or achievement 1",
+        "Responsibility or achievement 2",
+        "Responsibility or achievement 3"
+      ]
+    },
+    {
+      "title": "Job Title",
+      "organization": "Company Name",
+      "location": "City, State",
+      "duration": "Start Year - End Year",
+      "bullets": [
+        "Responsibility or achievement 1",
+        "Responsibility or achievement 2",
+        "Responsibility or achievement 3"
+      ]
+    },
+    {
+      "title": "Internship Title",
+      "organization": "Organization Name",
+      "location": "City, State",
+      "duration": "StartYear - EndYear",
+      "bullets": [
+        "Responsibility or achievement 1",
+        "Responsibility or achievement 2",
+        "Responsibility or achievement 3",
+        "Responsibility or achievement 4",
+        "Responsibility or achievement 5",
+        "Responsibility or achievement 6"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Project Name",
+      "technologies": "Technology 1, Technology 2",
+      "duration": "Duration",
+      "bullets": [
+        "Project detail 1",
+        "Project detail 2",
+        "Project detail 3",
+        "Project detail 4"
+      ]
+    },
+    {
+      "name": "Project Name",
+      "technologies": "Technology 1, Technology 2",
+      "duration": "Duration (e.g., 6 months)",
+      "bullets": [
+        "Project detail 1",
+        "Project detail 2",
+        "Project detail 3",
+        "Project detail 4"
+      ]
+    }
+  ],
+  "skills": {
+    "Languages": [
+      "Language 1",
+      "Language 2",
+      "Language 3",
+      "Language 4",
+      "Language 5",
+      "Language 6",
+      "Language 7"
+    ],
+    "Frameworks": [
+      "Framework 1",
+      "Framework 2",
+      "Framework 3",
+      "Framework 4",
+      "Framework 5",
+      "Framework 6",
+      "Framework 7"
+    ],
+    "Developer Tools": [
+      "Tool 1",
+      "Tool 2",
+      "Tool 3",
+      "Tool 4",
+      "Tool 5",
+      "Tool 6",
+      "Tool 7",
+      "Tool 8",
+      "Tool 9"
+    ],
+    "Libraries": [
+      "Library 1",
+      "Library 2",
+      "Library 3"
+    ]
+  },
+  "additional_sections": {
+    "Certifications": {
+      "AWS": [
+        "AWS Certification 1",
+        "AWS Certification 2"
+      ],
+      "Microsoft": [
+        "Microsoft Certification 1",
+        "Microsoft Certification 2"
+      ],
+      "Other": [
+        "Other Certification 1",
+        "Other Certification 2"
+      ]
+    }
+  }
+}
