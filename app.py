@@ -1,3 +1,4 @@
+import subprocess
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify,send_file
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -10,6 +11,8 @@ import json
 import os
 from resume_generator import ResumeGenerator
 from io import BytesIO
+from pylatexenc.latex2text import LatexNodes2Text
+
 
 # Load environment variables
 load_dotenv(dotenv_path=".env")
@@ -879,29 +882,30 @@ def generate_resume():
                     download_name='resume.tex')
 
 @app.route('/preview', methods=['POST'])
-def preview_resume():
-    """Endpoint to generate resume preview"""
-    if not request.is_json:
-        return {"error": "Content-Type must be application/json"}, 400
-    
-    data = request.get_json()
-    
+def preview():
     try:
-        # Generate LaTeX content
+        data = request.get_json()
+        
+        # Generate LaTeX or HTML content based on the form data
         latex_content = ResumeGenerator.from_json(data, "./resume_template.tex")
         
-        # Store the preview content in session for the preview page
-        session['preview_content'] = latex_content
-        
-        return jsonify({
-            "success": True,
-            "redirect_url": url_for('show_preview')
-        })
+        tex_filename = "resume_preview.tex"
+        with open(tex_filename, "w", encoding="utf-8") as tex_file:
+            tex_file.write(latex_content)
+        pdf_latex_path = "D:/ProgramsAndApps/MiKTeX/miktex/bin/x64/pdflatex.exe"
+        subprocess.run([pdf_latex_path, tex_filename], check=True)
+    
+        pdf_path = os.path.abspath("resume_preview.pdf")
+    
+        # Cleanup auxiliary files
+        for ext in ["aux", "log", "tex", "out"]:
+            os.remove(f"resume_preview.{ext}")
+        # Return the rendered HTML inside JSON
+        # return "<a href='/resume_preview.pdf?name=Guest' target='_blank'>Generate PDF</a>"
+        return send_file(pdf_path, mimetype="application/pdf")
     except Exception as e:
-        return jsonify({
-            "error": f"Error generating preview: {str(e)}"
-        }), 500
-
+        return jsonify({"error": str(e)}), 500
+    
 @app.route('/show_preview')
 def show_preview():
     """Display the resume preview page"""

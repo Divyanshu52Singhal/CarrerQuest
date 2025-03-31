@@ -314,28 +314,65 @@
         });
 
         // Preview Resume
+        // document.getElementById("previewBtn").addEventListener("click", function () {
+        //     // const formData = new FormData(document.getElementById("resumeForm"));
+        //     const formData = collectFormData();
+        //     // print(formData);
+        //     fetch("/preview", {
+        //         method: "POST",
+        //         body: JSON.stringify(formData),
+        //         headers: {
+        //             "Content-Type": "application/json"
+        //         }
+        //     })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             // Handle preview logic (e.g., open a modal or redirect to preview page)
+        //             console.log("Preview data:", data);
+        //         })
+        //         .catch(error => console.error("Error:", error));
+        // });
         document.getElementById("previewBtn").addEventListener("click", function () {
-            const formData = new FormData(document.getElementById("resumeForm"));
-            fetch("/preview", {
-                method: "POST",
-                body: JSON.stringify(Object.fromEntries(formData)),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Handle preview logic (e.g., open a modal or redirect to preview page)
-                    console.log("Preview data:", data);
-                })
-                .catch(error => console.error("Error:", error));
-        });
+    const formData = collectFormData();
 
+    fetch("/preview", {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to generate preview");
+            }
+            return response.blob(); // Expecting a PDF file as a blob
+        })
+        .then(blob => {
+            // Create a URL for the blob
+            const pdfUrl = window.URL.createObjectURL(blob);
+
+            // Open the PDF in a new tab
+            const newWindow = window.open(pdfUrl, "_blank");
+            if (!newWindow) {
+                alert("Please allow popups for this website to view the preview.");
+            }
+
+            // Optionally revoke the object URL after some time to free memory
+            setTimeout(() => {
+                window.URL.revokeObjectURL(pdfUrl);
+            }, 10000); // Revoke after 10 seconds
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred while generating the preview. Please try again.");
+        });
+});
         // Generate Resume
         document.getElementById("generateBtn").addEventListener("click", function () {
             // const formData = new FormData(document.getElementById("resumeForm"));
             const formData = collectFormData();
-            console.log(formData);
+            // console.log(formData);
             fetch("/generate", {
                 method: "POST",
                 body: JSON.stringify(formData),
