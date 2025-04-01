@@ -27,7 +27,7 @@
                 </div>
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" value="{{ form_data.email }}" readonly required>
+                    <input type="email" id="email" name="email" value="{{ form_data.email }}" required>
                 </div>
             </div>
             <div class="input-group">
@@ -188,9 +188,15 @@
         </div>
     </form>
 </div>
-<!-- PDF Preview Section -->
-<div class="pdf-preview-container">
-   <iframe id="pdfPreview" style="width: 100%; height: 100%; border: none;" src=""></iframe>
+<!-- Replace the PDF Preview Section with this -->
+<div class="preview-container">
+    <div class="preview-header">
+        <h2>LaTeX Preview</h2>
+        <button type="button" class="btn btn-secondary close-preview">Close</button>
+    </div>
+    <div class="preview-content">
+        <pre><code>{{ latex_content }}</code></pre>
+    </div>
 </div>
 </div>
 {% endblock %}
@@ -319,83 +325,68 @@
             }
         });
 
-        // Preview Resume
-        // document.getElementById("previewBtn").addEventListener("click", function () {
-        //     // const formData = new FormData(document.getElementById("resumeForm"));
-        //     const formData = collectFormData();
-        //     // print(formData);
-        //     fetch("/preview", {
-        //         method: "POST",
-        //         body: JSON.stringify(formData),
-        //         headers: {
-        //             "Content-Type": "application/json"
-        //         }
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             // Handle preview logic (e.g., open a modal or redirect to preview page)
-        //             console.log("Preview data:", data);
-        //         })
-        //         .catch(error => console.error("Error:", error));
-        // });
-        document.getElementById("previewBtn").addEventListener("click", function () {
-    const formData = collectFormData();
-
-    fetch("/preview", {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: {
-            "Content-Type": "application/json"
+        
+// Replace the existing preview button handler in your script
+document.getElementById('previewBtn').addEventListener('click', async function() {
+    try {
+        const formData = collectFormData();
+        
+        const response = await fetch('/preview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.error) {
+            alert('Error generating preview: ' + result.error);
+        } else {
+            // Show preview container and update content
+            const previewContainer = document.querySelector('.preview-container');
+            const previewContent = previewContainer.querySelector('code');
+            previewContent.textContent = result.latex_content;
+            previewContainer.style.display = 'block';
         }
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Failed to generate preview");
-            }
-            return response.blob(); // Expecting a PDF file as a blob
-        })
-        .then(blob => {
-            // Create a URL for the blob
-            const pdfUrl = window.URL.createObjectURL(blob);
-
-            // Load the PDF into the iframe
-            const pdfPreview = document.getElementById("pdfPreview");
-            pdfPreview.src = pdfUrl;
-
-            // Optionally revoke the object URL after some time to free memory
-            setTimeout(() => {
-                window.URL.revokeObjectURL(pdfUrl);
-            }, 10000); // Revoke after 10 seconds
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("An error occurred while generating the preview. Please try again.");
-        });
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error generating preview. Please try again.');
+    }
 });
-        // Generate Resume
-        document.getElementById("generateBtn").addEventListener("click", function () {
-            // const formData = new FormData(document.getElementById("resumeForm"));
-            const formData = collectFormData();
-            // console.log(formData);
-            fetch("/generate", {
-                method: "POST",
-                body: JSON.stringify(formData),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-                .then(response => response.blob())
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.style.display = "none";
-                    a.href = url;
-                    a.download = "resume.tex";
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                })
-                .catch(error => console.error("Error:", error));
+
+// Add close preview handler
+document.querySelector('.close-preview').addEventListener('click', function() {
+    document.querySelector('.preview-container').style.display = 'none';
+});
+
+// Also update the generate button handler for consistency:
+document.getElementById("generateBtn").addEventListener("click", async function() {
+    try {
+        const formData = collectFormData();
+        
+        const response = await fetch("/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
         });
-    });
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = "resume.tex";
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Error generating resume. Please try again.");
+    }
+});
+});
 </script>

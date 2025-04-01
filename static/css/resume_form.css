@@ -201,26 +201,42 @@
     margin-top: 15px;
 }
 
-/* Preview Container */
+/* Add to your existing CSS file or in a style tag */
 .preview-container {
-    margin-top: 30px;
-    padding: 25px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background: #f8f9fa;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: white;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    padding: 20px;
     display: none;
+    z-index: 1000;
+    overflow-y: auto;
 }
 
-.preview-container h3 {
-    font-size: 20px;
-    color: #333;
-    margin-bottom: 15px;
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
 }
 
-.preview-container p {
-    font-size: 14px;
-    color: #555;
-    line-height: 1.6;
+.preview-content {
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre-wrap;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.preview-content code {
+    display: block;
+    overflow-x: auto;
 }
 
 /* Responsive Design */

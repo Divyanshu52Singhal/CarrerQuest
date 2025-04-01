@@ -11,7 +11,6 @@ import json
 import os
 from resume_generator import ResumeGenerator
 from io import BytesIO
-from pylatexenc.latex2text import LatexNodes2Text
 
 
 # Load environment variables
@@ -832,35 +831,10 @@ def resume_form():
     # Load default resume data from JSON file
     with open('example_resume_data.json', 'r') as f:
         default_data = json.load(f)
-
-    # Merge student data with default data
-    # form_data = {
-    #     "name": student.get("name", default_data.get("name", "")),
-    #     "email": student.get("email", default_data.get("email", "")),
-    #     "phone": student.get("phone", default_data.get("phone", "")),
-    #     "linkedin_url": student.get("linkedin_url", default_data.get("linkedin_url", "")),
-    #     "linkedin_display": student.get("linkedin_display", default_data.get("linkedin_display", "")),
-    #     "github_url": student.get("github_url", default_data.get("github_url", "")),
-    #     "github_display": student.get("github_display", default_data.get("github_display", "")),
-    #     "education": student.get("education", default_data.get("education", [])),
-    #     "experience": student.get("experience", default_data.get("experience", [])),
-    #     "projects": student.get("projects", default_data.get("projects", [])),
-    #     "skills": student.get("skills", default_data.get("skills", {
-    #         "Languages": [],
-    #         "Frameworks": [],
-    #         "Developer Tools": [],
-    #         "Libraries": []
-    #     })),
-    #     "additional_sections": student.get("additional_sections", default_data.get("additional_sections", {
-    #         "Certifications": {
-    #             "AWS": [],
-    #             "Microsoft": [],
-    #             "Other": []
-    #         }
-    #     }))
-    # }
-    
-    return render_template('resume_form.html', form_data=default_data)
+    # Update default data with student information
+    default_data["student"] = student
+    latext_content = ResumeGenerator.from_json(default_data, "./resume_template.tex")
+    return render_template('resume_form.html', form_data=default_data,latext_content=latext_content)
 
 @app.route('/generate', methods=['POST'])
 def generate_resume():
@@ -885,35 +859,22 @@ def generate_resume():
 def preview():
     try:
         data = request.get_json()
-        
-        # Generate LaTeX or HTML content based on the form data
         latex_content = ResumeGenerator.from_json(data, "./resume_template.tex")
         
-        tex_filename = "resume_preview.tex"
-        with open(tex_filename, "w", encoding="utf-8") as tex_file:
-            tex_file.write(latex_content)
-        pdf_latex_path = "D:/ProgramsAndApps/MiKTeX/miktex/bin/x64/pdflatex.exe"
-        subprocess.run([pdf_latex_path, tex_filename], check=True)
-    
-        pdf_path = os.path.abspath("resume_preview.pdf")
-    
-        # Cleanup auxiliary files
-        for ext in ["aux", "log", "tex", "out"]:
-            os.remove(f"resume_preview.{ext}")
-        # Return the rendered HTML inside JSON
-        # return "<a href='/resume_preview.pdf?name=Guest' target='_blank'>Generate PDF</a>"
-        return send_file(pdf_path, mimetype="application/pdf")
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
-@app.route('/show_preview')
-def show_preview():
-    """Display the resume preview page"""
-    if 'preview_content' not in session:
-        return redirect(url_for('resume_form'))
+        return jsonify({
+            'success': True,
+            'latex_content': latex_content
+        })
         
-    latex_content = session['preview_content']
-    return render_template('preview_resume.html', latex_content=latex_content)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/preview-resume')
+def show_preview():
+    """Display the LaTeX resume preview."""
+    if "preview_content" not in session:
+        return redirect(url_for("resume_form"))
+    return render_template("preview_resume.html", latex_content=session["preview_content"])
 
 def calculate_overall_progress(student):
     """Calculate overall progress across all roadmaps"""
