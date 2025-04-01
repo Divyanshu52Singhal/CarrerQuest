@@ -188,15 +188,21 @@
         </div>
     </form>
 </div>
-<!-- Replace the PDF Preview Section with this -->
+<!-- Replace the existing preview container with this -->
 <div class="preview-container">
     <div class="preview-header">
-        <h2>LaTeX Preview</h2>
-        <button type="button" class="btn btn-secondary close-preview">Close</button>
+        <h2>Resume Preview</h2>
+        <div class="preview-actions">
+            <button type="button" class="btn btn-primary" id="openOverleafBtn">Open in Overleaf</button>
+            <button type="button" class="btn btn-secondary close-preview">Close</button>
+        </div>
     </div>
     <div class="preview-content">
-        <pre><code>{{ latex_content }}</code></pre>
+        <code id="latex-content">{{ latex_content }}</code>
     </div>
+    <form id="overleaf-form" action="https://www.overleaf.com/docs" method="post" target="_blank">
+        <input id="encoded-snip" type="hidden" name="encoded_snip">
+    </form>
 </div>
 </div>
 {% endblock %}
@@ -325,8 +331,12 @@
             }
         });
 
-        
-// Replace the existing preview button handler in your script
+        // Add to your existing script section
+document.getElementById('openOverleafBtn').addEventListener('click', function() {
+    const latexContent = document.getElementById('latex-content').textContent;
+    document.getElementById('encoded-snip').value = encodeURIComponent(latexContent);
+    document.getElementById('overleaf-form').submit();
+});
 document.getElementById('previewBtn').addEventListener('click', async function() {
     try {
         const formData = collectFormData();
@@ -346,8 +356,8 @@ document.getElementById('previewBtn').addEventListener('click', async function()
         } else {
             // Show preview container and update content
             const previewContainer = document.querySelector('.preview-container');
-            const previewContent = previewContainer.querySelector('code');
-            previewContent.textContent = result.latex_content;
+            const latexContent = document.getElementById('latex-content');
+            latexContent.textContent = result.latex_content;
             previewContainer.style.display = 'block';
         }
     } catch (error) {

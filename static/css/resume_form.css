@@ -1,31 +1,16 @@
-/* General Form Container */
+/* General Layout */
 .main-container {
     display: flex;
-    height: 100vh; /* Full height of the viewport */
+    height: 100vh;
 }
 
 .form-container {
-    flex: 1; /* Take up half the width */
+    flex: 1;
     padding: 20px;
     overflow-y: auto;
     background-color: #f9f9f9;
     border-right: 1px solid #ddd;
 }
-
-.pdf-preview-container {
-    flex: 1; /* Take up the other half of the width */
-    background-color: #fff;
-}
-
-/* .form-container {
-    max-width: 1000px;
-    margin: 20px auto;
-    padding: 30px;
-    background: linear-gradient(135deg, #ffffff, #f4f6f9);
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    font-family: 'Arial', sans-serif;
-} */
 
 /* Form Header */
 .form-header {
@@ -44,6 +29,7 @@
     margin: 0;
 }
 
+/* Form Actions */
 .form-actions {
     display: flex;
     gap: 15px;
@@ -87,34 +73,129 @@
     font-size: 16px;
     color: #555;
     margin-bottom: 8px;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .form-group input {
     width: 100%;
     padding: 12px;
     font-size: 14px;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     border-radius: 6px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .form-group input:focus {
     border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
     outline: none;
 }
 
-/* Input Groups */
-.input-group {
-    display: flex;
-    gap: 20px;
+/* Preview Container */
+.preview-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    background: white;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+    overflow: hidden;
 }
 
-.input-group .form-group {
+.preview-header {
+    padding: 20px;
+    border-bottom: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+.preview-content {
     flex: 1;
+    padding: 20px;
+    overflow-y: scroll;
+    background: #fff;
+    position: relative;
 }
 
+/* Code Display */
+#latex-content {
+    display: block;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 20px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #1a1a1a;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    overflow-x: auto;
+    max-height: calc(100vh - 120px); /* Account for header and padding */
+}
+
+
+/* Buttons */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #bd2130;
+    transform: translateY(-2px);
+}
+.btn-success {
+    background: #28a745;
+    color: white;
+    border: none;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-success:active {
+    background: #1e7e34;
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(40, 167, 69, 0.2);
+}
 /* Dynamic Sections */
 .dynamic-section {
     background: #f9fafc;
@@ -122,7 +203,7 @@
     padding: 20px;
     margin-bottom: 20px;
     border: 1px solid #ddd;
-    transition: background 0.3s ease, border-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .dynamic-section:hover {
@@ -137,120 +218,134 @@
 
 .bullet-point {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     margin-bottom: 10px;
+    align-items: center;
 }
 
 .bullet-point input {
     flex: 1;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.bullet-point input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    outline: none;
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+    width: 8px;
 }
 
-/* Buttons */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    transition: background 0.3s ease, transform 0.2s ease;
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
 }
 
-.btn-primary {
-    background: #007bff;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #0056b3;
-    transform: translateY(-2px);
-}
-
-.btn-danger {
-    background: #dc3545;
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #a71d2a;
-    transform: translateY(-2px);
-}
-
-.btn-success {
-    background: #28a745;
-    color: white;
-}
-
-.btn-success:hover {
-    background: #1e7e34;
-    transform: translateY(-2px);
-}
-
-#add-education, #add-experience, #add-project {
-    margin-top: 15px;
-}
-
-/* Add to your existing CSS file or in a style tag */
-.preview-container {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 50%;
-    height: 100%;
-    background: white;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-    padding: 20px;
-    display: none;
-    z-index: 1000;
-    overflow-y: auto;
-}
-
-.preview-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-.preview-content {
-    font-family: 'Courier New', Courier, monospace;
-    white-space: pre-wrap;
-    background: #f8f9fa;
-    padding: 15px;
+::-webkit-scrollbar-thumb {
+    background: #888;
     border-radius: 4px;
-    border: 1px solid #dee2e6;
 }
 
-.preview-content code {
-    display: block;
-    overflow-x: auto;
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Input Groups */
+.input-group {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.input-group .form-group {
+    flex: 1;
+    margin-bottom: 0;
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+    .preview-container {
+        width: 60%;
+    }
+}
+
+@media (max-width: 992px) {
+    .preview-container {
+        width: 70%;
+    }
+}
+
 @media (max-width: 768px) {
     .input-group {
         flex-direction: column;
+        gap: 15px;
     }
 
     .form-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 15px;
+    }
+
+    .preview-container {
+        width: 100%;
     }
 
     .form-actions {
-        margin-top: 15px;
+        width: 100%;
+        justify-content: flex-start;
     }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
+
+.preview-content::-webkit-scrollbar {
+    width: 12px; /* Wider scrollbar */
+}
+
+.preview-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 6px;
+    margin: 4px 0; /* Add some space around scrollbar */
+}
+
+.preview-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 6px;
+    border: 3px solid #f1f1f1; /* Creates padding effect */
+}
+
+.preview-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Scroll Shadows */
+.preview-content::before,
+.preview-content::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 20px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.preview-content::before {
+    top: 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+}
+
+.preview-content::after {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+}
+
+/* Firefox Scrollbar Support */
+.preview-content {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}
+
+/* Add smooth scrolling */
+html {
+    scroll-behavior: smooth;
 }
