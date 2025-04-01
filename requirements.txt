@@ -1,9 +1,9 @@
 python-dotenv
 psycopg2
 gunicorn
-Flask
-Flask-PyMongo
-Flask-Bcrypt
+flask
+flask-pymongo
+flask-bcrypt
 python-dotenv
-boto3
 bson
+resume-generator
