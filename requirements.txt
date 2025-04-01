@@ -5,4 +5,3 @@ flask
 flask-pymongo
 flask-bcrypt
 python-dotenv
-bson
